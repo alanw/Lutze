@@ -279,6 +279,8 @@ Roadmap
   frequency of object creations and/or the number of objects waiting to be
   transfered.
 * Add support for incremental mark and sweep.
+* Include some sort of performance testing metrics.
+* Add gc collection statistics (times, frequency, queue sizes, etc)
 * Perhaps introduce support for generations.
 * Investigate ways to minimize problems or race conditions outlined above.
 * Look at ways to eliminate the need for mark_members().

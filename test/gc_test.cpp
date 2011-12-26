@@ -1232,17 +1232,4 @@ namespace test_thread_object_transfer
     }
 }
 
-// todo:
-// 2) add todo: weak references - a separate table use to link weak refs to strong objects (ie. won't get marked)
-// todo: idea, what about hashing or rotating, or xoring object address - this is then used to reference real object
-
-// todo: some sort of perf test
-// todo: need a summary (returned as a data structure) of gc statistics (boost performance timer?)
-// - number of collections
-// - max time to perform gc
-// - avg time
-// - max/avg release queue size
-// - number of objects destroyed/transfered
-
-
 BOOST_AUTO_TEST_SUITE_END()
