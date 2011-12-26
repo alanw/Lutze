@@ -252,7 +252,7 @@ Build Instructions using CMake
 Simply run CMake to generate the required Makefile or project and build the
 unit test application gc_test.
 
-Note: The Lutze garbage collector uses `Boost <http://www.boost.org`_ in order
+Note: The Lutze garbage collector uses `Boost <http://www.boost.org>`_ in order
 to provide cross-platform support for threads, plus some other useful utilities
 such as boost::unordered_map.
 
@@ -263,7 +263,7 @@ packages that make using Boost libraries easier.
 Acknowledgments
 ---------------
 
-Parts of the stack-scanning code shamelessly borrowed from the `Tamarin <http://www-archive.mozilla.org/projects/tamarin`_
+Parts of the stack-scanning code shamelessly borrowed from the `Tamarin <http://www-archive.mozilla.org/projects/tamarin>`_
 project. Particular credit should go to:
 
 * Tommy Reilly
