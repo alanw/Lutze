@@ -119,9 +119,11 @@ namespace lutze
             std::swap(px, rhs.px);
         }
 
-        operator bool() const
+        typedef T* this_type::*unspecified_bool_type;
+
+        operator unspecified_bool_type() const
         {
-            return px != 0;
+            return px == 0 ? 0: &this_type::px;
         }
 
         bool operator ! () const
