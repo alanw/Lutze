@@ -30,6 +30,7 @@ Features
 * Thread safe and multi-thread compatible.
 * Supports garbage collected objects and collections.
 * Can be used with raw pointers or managed pointers that assist collections.
+* Does not stop the (entire) world when performing collections.
 * Destructors called when objects are destroyed.
 * Works well with unmanaged objects.
 * All code contained in header files - just #include to start using!
@@ -263,7 +264,7 @@ packages that make using Boost libraries easier.
 Acknowledgments
 ---------------
 
-Parts of the stack-scanning code shamelessly borrowed from the `Tamarin <http://www-archive.mozilla.org/projects/tamarin>`_
+Parts of the stack-scanning were inspired by the `Tamarin <http://www-archive.mozilla.org/projects/tamarin>`_
 project. Particular credit should go to:
 
 * Tommy Reilly
