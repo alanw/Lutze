@@ -447,8 +447,7 @@ namespace lutze
                 {
                     // manually destroy object before unregistering from this gc
                     node->second.object->~gc_object();
-                    ::operator delete(const_cast<gc_object*>(node->second.object));
-                    unregister_object(node->second.object);
+                    gc_object::operator delete(const_cast<gc_object*>(node->second.object), *this);
                 }
                 else
                 {
@@ -509,9 +508,7 @@ namespace lutze
 
     void gc_object::operator delete (void* p)
     {
-        gc_object* pobj = static_cast<gc_object*>(p);
-        get_gc().unregister_object(pobj);
-        ::operator delete(pobj);
+        gc_object::operator delete(p, get_gc());
     }
 }
 
