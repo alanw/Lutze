@@ -13,7 +13,7 @@
 #include "boost/thread/tss.hpp"
 #include "boost/thread/mutex.hpp"
 
-#define _GC_VERSION "1.0"
+#define _GC_VERSION "1.0.1"
 
 #if defined(_WIN32) || defined(_WIN64)
 #define GC_PLATFORM_WINDOWS
