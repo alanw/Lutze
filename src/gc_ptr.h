@@ -7,6 +7,9 @@
 #ifndef _GC_PTR
 #define _GC_PTR
 
+#include <boost/preprocessor/punctuation.hpp>
+#include <boost/preprocessor/repetition.hpp>
+#include <boost/preprocessor/arithmetic.hpp>
 #include "gc.h"
 
 namespace lutze
@@ -186,205 +189,29 @@ namespace lutze
         return reinterpret_cast<T*>(p.get());
     }
 
-    template <class T>
-    gc_ptr<T> new_gc_placeholder(gc& gc)
-    {
-        gc_ptr<T> obj(new(gc) T);
-        gc.collect();
-        return obj;
-    }
+    // This expands to...
+    // template <class T, class A1, ...etc>
+    // gc_ptr<T> new_gc(A1 const& a1, ...etc)
+    // {
+    //     return new_gc_placeholder<T>(get_gc(), a1, ...etc);
+    // }
 
-    template <class T>
-    gc_ptr<T> new_gc()
-    {
-        return new_gc_placeholder<T>(get_gc());
-    }
-
-    template <class T>
-    gc_ptr<T> new_static_gc()
-    {
-        return new_gc_placeholder<T>(get_static_gc());
-    }
-
-    template <class T, class A1>
-    gc_ptr<T> new_gc_placeholder(gc& gc, A1 const& a1)
-    {
-        gc_ptr<T> obj(new(gc) T(a1));
-        gc.collect();
-        return obj;
-    }
-
-    template <class T, class A1>
-    gc_ptr<T> new_gc(A1 const& a1)
-    {
-        return new_gc_placeholder<T>(get_gc(), a1);
-    }
-
-    template <class T, class A1>
-    gc_ptr<T> new_static_gc(A1 const& a1)
-    {
-        return new_gc_placeholder<T>(get_static_gc(), a1);
-    }
-
-    template <class T, class A1, class A2>
-    gc_ptr<T> new_gc_placeholder(gc& gc, A1 const& a1, A2 const& a2)
-    {
-        gc_ptr<T> obj(new(gc) T(a1, a2));
-        gc.collect();
-        return obj;
-    }
-
-    template <class T, class A1, class A2>
-    gc_ptr<T> new_gc(A1 const& a1, A2 const& a2)
-    {
-        return new_gc_placeholder<T>(get_gc(), a1, a2);
-    }
-
-    template <class T, class A1, class A2>
-    gc_ptr<T> new_static_gc(A1 const& a1, A2 const& a2)
-    {
-        return new_gc_placeholder<T>(get_static_gc(), a1, a2);
-    }
-
-    template <class T, class A1, class A2, class A3>
-    gc_ptr<T> new_gc_placeholder(gc& gc, A1 const& a1, A2 const& a2, A3 const& a3)
-    {
-        gc_ptr<T> obj(new(gc) T(a1, a2, a3));
-        gc.collect();
-        return obj;
-    }
-
-    template <class T, class A1, class A2, class A3>
-    gc_ptr<T> new_gc(A1 const& a1, A2 const& a2, A3 const& a3)
-    {
-        return new_gc_placeholder<T>(get_gc(), a1, a2, a3);
-    }
-
-    template <class T, class A1, class A2, class A3>
-    gc_ptr<T> new_static_gc(A1 const& a1, A2 const& a2, A3 const& a3)
-    {
-        return new_gc_placeholder<T>(get_static_gc(), a1, a2, a3);
-    }
-
-    template <class T, class A1, class A2, class A3, class A4>
-    gc_ptr<T> new_gc_placeholder(gc& gc, A1 const& a1, A2 const& a2, A3 const& a3, A4 const& a4)
-    {
-        gc_ptr<T> obj(new(gc) T(a1, a2, a3, a4));
-        gc.collect();
-        return obj;
-    }
-
-    template <class T, class A1, class A2, class A3, class A4>
-    gc_ptr<T> new_gc(A1 const& a1, A2 const& a2, A3 const& a3, A4 const& a4)
-    {
-        return new_gc_placeholder<T>(get_gc(), a1, a2, a3, a4);
-    }
-
-    template <class T, class A1, class A2, class A3, class A4>
-    gc_ptr<T> new_static_gc(A1 const& a1, A2 const& a2, A3 const& a3, A4 const& a4)
-    {
-        return new_gc_placeholder<T>(get_static_gc(), a1, a2, a3, a4);
-    }
-
-    template <class T, class A1, class A2, class A3, class A4, class A5>
-    gc_ptr<T> new_gc_placeholder(gc& gc, A1 const& a1, A2 const& a2, A3 const& a3, A4 const& a4, A5 const& a5)
-    {
-        gc_ptr<T> obj(new(gc) T(a1, a2, a3, a4, a5));
-        gc.collect();
-        return obj;
-    }
-
-    template <class T, class A1, class A2, class A3, class A4, class A5>
-    gc_ptr<T> new_gc(A1 const& a1, A2 const& a2, A3 const& a3, A4 const& a4, A5 const& a5)
-    {
-        return new_gc_placeholder<T>(get_gc(), a1, a2, a3, a4, a5);
-    }
-
-    template <class T, class A1, class A2, class A3, class A4, class A5>
-    gc_ptr<T> new_static_gc(A1 const& a1, A2 const& a2, A3 const& a3, A4 const& a4, A5 const& a5)
-    {
-        return new_gc_placeholder<T>(get_static_gc(), a1, a2, a3, a4, a5);
-    }
-
-    template <class T, class A1, class A2, class A3, class A4, class A5, class A6>
-    gc_ptr<T> new_gc_placeholder(gc& gc, A1 const& a1, A2 const& a2, A3 const& a3, A4 const& a4, A5 const& a5, A6 const& a6)
-    {
-        gc_ptr<T> obj(new(gc) T(a1, a2, a3, a4, a5, a6));
-        gc.collect();
-        return obj;
-    }
-
-    template <class T, class A1, class A2, class A3, class A4, class A5, class A6>
-    gc_ptr<T> new_gc(A1 const& a1, A2 const& a2, A3 const& a3, A4 const& a4, A5 const& a5, A6 const& a6)
-    {
-        return new_gc_placeholder<T>(get_gc(), a1, a2, a3, a4, a5, a6);
-    }
-
-    template <class T, class A1, class A2, class A3, class A4, class A5, class A6>
-    gc_ptr<T> new_static_gc(A1 const& a1, A2 const& a2, A3 const& a3, A4 const& a4, A5 const& a5, A6 const& a6)
-    {
-        return new_gc_placeholder<T>(get_static_gc(), a1, a2, a3, a4, a5, a6);
-    }
-
-    template <class T, class A1, class A2, class A3, class A4, class A5, class A6, class A7>
-    gc_ptr<T> new_gc_placeholder(gc& gc, A1 const& a1, A2 const& a2, A3 const& a3, A4 const& a4, A5 const& a5, A6 const& a6, A7 const& a7)
-    {
-        gc_ptr<T> obj(new(gc) T(a1, a2, a3, a4, a5, a6, a7));
-        gc.collect();
-        return obj;
-    }
-
-    template <class T, class A1, class A2, class A3, class A4, class A5, class A6, class A7>
-    gc_ptr<T> new_gc(A1 const& a1, A2 const& a2, A3 const& a3, A4 const& a4, A5 const& a5, A6 const& a6, A7 const& a7)
-    {
-        return new_gc_placeholder<T>(get_gc(), a1, a2, a3, a4, a5, a6, a7);
-    }
-
-    template <class T, class A1, class A2, class A3, class A4, class A5, class A6, class A7>
-    gc_ptr<T> new_static_gc(A1 const& a1, A2 const& a2, A3 const& a3, A4 const& a4, A5 const& a5, A6 const& a6, A7 const& a7)
-    {
-        return new_gc_placeholder<T>(get_static_gc(), a1, a2, a3, a4, a5, a6, a7);
-    }
-
-    template <class T, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8>
-    gc_ptr<T> new_gc_placeholder(gc& gc, A1 const& a1, A2 const& a2, A3 const& a3, A4 const& a4, A5 const& a5, A6 const& a6, A7 const& a7, A8 const& a8)
-    {
-        gc_ptr<T> obj(new(gc) T(a1, a2, a3, a4, a5, a6, a7, a8));
-        gc.collect();
-        return obj;
-    }
-
-    template <class T, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8>
-    gc_ptr<T> new_gc(A1 const& a1, A2 const& a2, A3 const& a3, A4 const& a4, A5 const& a5, A6 const& a6, A7 const& a7, A8 const& a8)
-    {
-        return new_gc_placeholder<T>(get_gc(), a1, a2, a3, a4, a5, a6, a7, a8);
-    }
-
-    template <class T, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8>
-    gc_ptr<T> new_static_gc(A1 const& a1, A2 const& a2, A3 const& a3, A4 const& a4, A5 const& a5, A6 const& a6, A7 const& a7, A8 const& a8)
-    {
-        return new_gc_placeholder<T>(get_static_gc(), a1, a2, a3, a4, a5, a6, a7, a8);
-    }
-
-    template <class T, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9>
-    gc_ptr<T> new_gc_placeholder(gc& gc, A1 const& a1, A2 const& a2, A3 const& a3, A4 const& a4, A5 const& a5, A6 const& a6, A7 const& a7, A8 const& a8, A9 const& a9)
-    {
-        gc_ptr<T> obj(new(gc) T(a1, a2, a3, a4, a5, a6, a7, a8, a9));
-        gc.collect();
-        return obj;
-    }
-
-    template <class T, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9>
-    gc_ptr<T> new_gc(A1 const& a1, A2 const& a2, A3 const& a3, A4 const& a4, A5 const& a5, A6 const& a6, A7 const& a7, A8 const& a8, A9 const& a9)
-    {
-        return new_gc_placeholder<T>(get_gc(), a1, a2, a3, a4, a5, a6, a7, a8, a9);
-    }
-
-    template <class T, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9>
-    gc_ptr<T> new_static_gc(A1 const& a1, A2 const& a2, A3 const& a3, A4 const& a4, A5 const& a5, A6 const& a6, A7 const& a7, A8 const& a8, A9 const& a9)
-    {
-        return new_gc_placeholder<T>(get_static_gc(), a1, a2, a3, a4, a5, a6, a7, a8, a9);
-    }
+    // template <class T, class A1, ...etc>
+    // gc_ptr<T> new_static_gc(A1 const& a1, ...etc)
+    // {
+    // return new_gc_placeholder<T>(get_static_gc(), a1, ...etc);
+    // }
+    #define NEW_GC(Z, N, _) \
+    template<class T BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, class A)> \
+    gc_ptr<T> new_gc_placeholder(gc& gc BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, const A, & a)) \
+    { gc_ptr<T> obj(new(gc) T(BOOST_PP_ENUM_PARAMS(N, a))); gc.collect(); return obj; } \
+    template<class T BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, class A)> \
+    gc_ptr<T> new_gc(BOOST_PP_ENUM_BINARY_PARAMS(N, const A, & a)) \
+    { return new_gc_placeholder<T>(get_gc() BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)); } \
+    template<class T BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, class A)> \
+    gc_ptr<T> new_static_gc(BOOST_PP_ENUM_BINARY_PARAMS(N, const A, & a)) \
+    { return new_gc_placeholder<T>(get_static_gc() BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)); }
+    BOOST_PP_REPEAT_2ND(BOOST_PP_INC(9), NEW_GC, _)
 }
 
 #endif

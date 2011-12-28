@@ -35,6 +35,57 @@ namespace test_version
     }
 }
 
+namespace test_variadic_new_gc
+{
+    class test_object0 : public gc_object
+    {
+    public:
+        test_object0()
+        {
+        }
+    };
+
+    class test_object1 : public gc_object
+    {
+    public:
+        test_object1(const std::string a1)
+        {
+        }
+    };
+
+    class test_object2 : public gc_object
+    {
+    public:
+        test_object2(const std::string a1, const std::string a2)
+        {
+        }
+    };
+
+    class test_object9 : public gc_object
+    {
+    public:
+        test_object9(const std::string a1, const std::string a2, const std::string a3,
+                     const std::string a4, const std::string a5, const std::string a6,
+                     const std::string a7, const std::string a8, const std::string a9)
+        {
+        }
+    };
+
+    typedef gc_ptr<test_object0> test_object0_ptr;
+    typedef gc_ptr<test_object1> test_object1_ptr;
+    typedef gc_ptr<test_object2> test_object2_ptr;
+    typedef gc_ptr<test_object9> test_object9_ptr;
+
+    BOOST_AUTO_TEST_CASE(test_variadic_new_gc)
+    {
+        test_object0_ptr test0 = new_gc<test_object0>();
+        test_object1_ptr test1 = new_gc<test_object1>("a1");
+        test_object2_ptr test2 = new_gc<test_object2>("a1", "a2");
+        test_object9_ptr test9 = new_gc<test_object9>("a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8", "a9");
+        get_gc().collect(true);
+    }
+}
+
 namespace test_collect_pointer
 {
     int32_t instance_count = 0;
