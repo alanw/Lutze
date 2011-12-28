@@ -605,17 +605,20 @@ namespace lutze
         typedef typename T::key_type key_type;
         typedef typename T::mapped_type mapped_type;
         typedef typename T::value_type value_type;
-        typedef typename T::reference reference;
-        typedef typename T::const_reference const_reference;
         typedef typename gc_container<T, key_type, typename T::mapped_type>::iterator iterator;
         typedef typename gc_container<T, key_type, typename T::mapped_type>::const_iterator const_iterator;
 
-        map_container(gc_container<T, key_type, typename T::mapped_type>* p = 0) : container_ptr< gc_container<T, key_type, typename T::mapped_type> >(p)
+        map_container(gc_container<T, key_type, mapped_type>* p = 0) : container_ptr< gc_container<T, key_type, mapped_type> >(p)
         {
         }
 
-        map_container(const map_container& rhs) : container_ptr< gc_container<T, key_type, typename T::mapped_type> >(rhs)
+        map_container(const map_container& rhs) : container_ptr< gc_container<T, key_type, mapped_type> >(rhs)
         {
+        }
+
+        size_type count(const key_type& x) const
+        {
+            return this->px->count(x);
         }
 
         std::pair<iterator, iterator> equal_range(const key_type& x)
@@ -684,7 +687,7 @@ namespace lutze
             return this->px->upper_bound(x);
         }
 
-        reference operator [] (const key_type& x)
+        mapped_type& operator [] (const key_type &x)
         {
             return (*this->px)[x];
         }
