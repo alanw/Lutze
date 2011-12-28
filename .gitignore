@@ -4,3 +4,4 @@ CMakeFiles/*
 Makefile
 *.cmake
 gc_test
+build
