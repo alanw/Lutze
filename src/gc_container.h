@@ -78,8 +78,6 @@ namespace lutze
         typedef typename T::size_type size_type;
         typedef typename T::iterator iterator;
         typedef typename T::const_iterator const_iterator;
-        typedef typename T::reverse_iterator reverse_iterator;
-        typedef typename T::const_reverse_iterator const_reverse_iterator;
 
         container_ptr(T* p = 0) : gc_ptr<T>(p)
         {
@@ -119,26 +117,6 @@ namespace lutze
             return this->px->end();
         }
 
-        reverse_iterator rbegin()
-        {
-            return this->px->rbegin();
-        }
-
-        const_reverse_iterator rbegin() const
-        {
-            return this->px->rbegin();
-        }
-
-        reverse_iterator rend()
-        {
-            return this->px->rend();
-        }
-
-        const_reverse_iterator rend() const
-        {
-            return this->px->rend();
-        }
-
         size_type size() const
         {
             return this->px->size();
@@ -154,8 +132,10 @@ namespace lutze
         typedef typename T::value_type value_type;
         typedef typename T::reference reference;
         typedef typename T::const_reference const_reference;
-        typedef typename gc_container<T, value_type>::iterator iterator;
-        typedef typename gc_container<T, value_type>::const_iterator const_iterator;
+        typedef typename T::iterator iterator;
+        typedef typename T::const_iterator const_iterator;
+        typedef typename T::reverse_iterator reverse_iterator;
+        typedef typename T::const_reverse_iterator const_reverse_iterator;
 
         vector_container(gc_container<T, value_type>* p = 0) : container_ptr< gc_container<T, value_type> >(p)
         {
@@ -261,12 +241,32 @@ namespace lutze
         {
             this->px->resize(n, x);
         }
+
+        reverse_iterator rbegin()
+        {
+            return this->px->rbegin();
+        }
+
+        const_reverse_iterator rbegin() const
+        {
+            return this->px->rbegin();
+        }
+
+        reverse_iterator rend()
+        {
+            return this->px->rend();
+        }
+
+        const_reverse_iterator rend() const
+        {
+            return this->px->rend();
+        }
     };
 
     template <class T>
     vector_container<T> new_vector_placeholder(gc& gc, typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
     {
-        vector_container<T> container(vector_container<T>(new(gc) gc_container<T, typename T::value_type>()));
+        vector_container<T> container(new(gc) gc_container<T, typename T::value_type>());
         container.resize(n, x);
         return container;
     }
@@ -286,7 +286,7 @@ namespace lutze
     template <class T, class Iter>
     vector_container<T> new_vector_placeholder(gc& gc, Iter first, Iter last)
     {
-        vector_container<T> container(vector_container<T>(new(gc) gc_container<T, typename T::value_type>()));
+        vector_container<T> container(new(gc) gc_container<T, typename T::value_type>());
         container.assign(first, last);
         return container;
     }
@@ -332,7 +332,7 @@ namespace lutze
     template <class T>
     deque_container<T> new_deque_placeholder(gc& gc, typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
     {
-        deque_container<T> container(deque_container<T>(new(gc) gc_container<T, typename T::value_type>()));
+        deque_container<T> container(new(gc) gc_container<T, typename T::value_type>());
         container.resize(n, x);
         return container;
     }
@@ -375,8 +375,8 @@ namespace lutze
     public:
         typedef T list_type;
         typedef typename T::value_type value_type;
-        typedef typename gc_container<T, value_type>::iterator iterator;
-        typedef typename gc_container<T, value_type>::const_iterator const_iterator;
+        typedef typename T::iterator iterator;
+        typedef typename T::const_iterator const_iterator;
 
         list_container(gc_container<T, value_type>* p = 0) : deque_container<T>(p)
         {
@@ -449,7 +449,7 @@ namespace lutze
     template <class T>
     list_container<T> new_list_placeholder(gc& gc, typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
     {
-        list_container<T> container(list_container<T>(new(gc) gc_container<T, typename T::value_type>()));
+        list_container<T> container(new(gc) gc_container<T, typename T::value_type>());
         container.resize(n, x);
         return container;
     }
@@ -495,8 +495,8 @@ namespace lutze
         typedef typename T::value_type value_type;
         typedef typename T::reference reference;
         typedef typename T::const_reference const_reference;
-        typedef typename gc_container<T, value_type>::iterator iterator;
-        typedef typename gc_container<T, value_type>::const_iterator const_iterator;
+        typedef typename T::iterator iterator;
+        typedef typename T::const_iterator const_iterator;
 
         set_container(gc_container<T, value_type>* p = 0) : container_ptr< gc_container<T, value_type> >(p)
         {
@@ -579,7 +579,7 @@ namespace lutze
     template <class T, class Iter>
     set_container<T> new_set_placeholder(gc& gc, Iter first, Iter last)
     {
-        set_container<T> container(set_container<T>(new(gc) gc_container<T, typename T::value_type>()));
+        set_container<T> container(new(gc) gc_container<T, typename T::value_type>());
         container.insert(first, last);
         return container;
     }
@@ -719,7 +719,7 @@ namespace lutze
     template <class T, class Iter>
     map_container<T> new_map_placeholder(gc& gc, Iter first, Iter last)
     {
-        map_container<T> container(map_container<T>(new(gc) gc_container<T, typename T::key_type, typename T::mapped_type>()));
+        map_container<T> container(new(gc) gc_container<T, typename T::key_type, typename T::mapped_type>());
         container.insert(first, last);
         return container;
     }
