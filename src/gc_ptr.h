@@ -30,15 +30,10 @@ namespace lutze
             static yes f(T*);
             static no f(...);
 
-            static Y* get();
-            static const bool value = sizeof(f(get())) == sizeof(yes);
+            enum _vt { value = sizeof((f)(static_cast<Y*>(0))) == sizeof(yes) };
         };
 
-        struct gc_ptr_true
-        {
-        };
-
-        struct gc_ptr_false
+        struct gc_ptr_empty
         {
         };
 
@@ -48,13 +43,12 @@ namespace lutze
         template <>
         struct gc_ptr_enable_if_convertible_impl<true>
         {
-            typedef gc_ptr_true type;
+            typedef gc_ptr_empty type;
         };
 
         template <>
         struct gc_ptr_enable_if_convertible_impl<false>
         {
-            typedef gc_ptr_false type;
         };
 
         template <class Y, class T>
@@ -75,7 +69,7 @@ namespace lutze
         }
 
         template <class U>
-        gc_ptr(const gc_ptr<U>& rhs, typename detail::gc_ptr_enable_if_convertible<U, T>::type = detail::gc_ptr_true()) : px(rhs.get())
+        gc_ptr(const gc_ptr<U>& rhs, typename detail::gc_ptr_enable_if_convertible<U, T>::type = detail::gc_ptr_empty()) : px(rhs.get())
         {
         }
 
