@@ -16,6 +16,11 @@ namespace lutze
 {
     namespace detail
     {
+        struct static_cast_tag {};
+        struct const_cast_tag {};
+        struct dynamic_cast_tag {};
+        struct reinterpret_cast_tag {};
+
         template <class Y, class T>
         struct gc_ptr_convertible
         {
@@ -74,6 +79,26 @@ namespace lutze
         {
         }
 
+        template <class U>
+        gc_ptr(const gc_ptr<U>& rhs, detail::static_cast_tag): px(static_cast<T*>(rhs.get()))
+        {
+        }
+
+        template <class U>
+        gc_ptr(const gc_ptr<U>& rhs, detail::const_cast_tag): px(const_cast<T*>(rhs.get()))
+        {
+        }
+
+        template <class U>
+        gc_ptr(const gc_ptr<U>& rhs, detail::dynamic_cast_tag): px(dynamic_cast<T*>(rhs.get()))
+        {
+        }
+
+        template <class U>
+        gc_ptr(const gc_ptr<U>& rhs, detail::reinterpret_cast_tag): px(reinterpret_cast<T*>(rhs.get()))
+        {
+        }
+
         ~gc_ptr()
         {
             px = 0;
@@ -85,7 +110,8 @@ namespace lutze
             return *this;
         }
 
-        gc_ptr& operator = (T* rhs)
+        template <class Y>
+        gc_ptr& operator = (const gc_ptr<Y>& rhs)
         {
             this_type(rhs).swap(*this);
             return *this;
@@ -168,25 +194,25 @@ namespace lutze
     template <class T, class U>
     gc_ptr<T> gc_ptr_static_cast(const gc_ptr<U>& p)
     {
-        return static_cast<T*>(p.get());
+        return gc_ptr<T>(p, detail::static_cast_tag());
     }
 
     template <class T, class U>
     gc_ptr<T> gc_ptr_const_cast(const gc_ptr<U>& p)
     {
-        return const_cast<T*>(p.get());
+        return gc_ptr<T>(p, detail::const_cast_tag());
     }
 
     template <class T, class U>
     gc_ptr<T> gc_ptr_dynamic_cast(const gc_ptr<U>& p)
     {
-        return dynamic_cast<T*>(p.get());
+        return gc_ptr<T>(p, detail::dynamic_cast_tag());
     }
 
     template <class T, class U>
     gc_ptr<T> gc_ptr_reinterpret_cast(const gc_ptr<U>& p)
     {
-        return reinterpret_cast<T*>(p.get());
+        return gc_ptr<T>(p, detail::reinterpret_cast_tag());
     }
 
     // This expands to...
