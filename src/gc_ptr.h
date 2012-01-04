@@ -203,30 +203,6 @@ namespace lutze
     {
         return gc_ptr<T>(p, detail::reinterpret_cast_tag());
     }
-
-    // // This expands to...
-    // // template <class T, class A1, ...etc>
-    // // gc_ptr<T> new_gc(A1 const& a1, ...etc)
-    // // {
-    // //     return new_gc_placeholder<T>(get_gc(), a1, ...etc);
-    // // }
-
-    // // template <class T, class A1, ...etc>
-    // // gc_ptr<T> new_static_gc(A1 const& a1, ...etc)
-    // // {
-    // // return new_gc_placeholder<T>(get_static_gc(), a1, ...etc);
-    // // }
-    // #define NEW_GC(Z, N, _) \
-    // template<class T BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, class A)> \
-    // gc_ptr<T> new_gc_placeholder(gc& gc BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, const A, & a)) \
-    // { gc_ptr<T> obj(new(gc) T(BOOST_PP_ENUM_PARAMS(N, a))); gc.collect(); return obj; } \
-    // template<class T BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, class A)> \
-    // gc_ptr<T> new_gc(BOOST_PP_ENUM_BINARY_PARAMS(N, const A, & a)) \
-    // { return new_gc_placeholder<T>(get_gc() BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)); } \
-    // template<class T BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, class A)> \
-    // gc_ptr<T> new_static_gc(BOOST_PP_ENUM_BINARY_PARAMS(N, const A, & a)) \
-    // { return new_gc_placeholder<T>(get_static_gc() BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)); }
-    // BOOST_PP_REPEAT_2ND(BOOST_PP_INC(9), NEW_GC, _)
 }
 
 #endif
