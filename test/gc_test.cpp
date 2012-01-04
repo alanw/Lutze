@@ -705,7 +705,7 @@ namespace test_set
     };
 
     typedef gc_ptr<elem_object> elem_object_ptr;
-    typedef set_container< std::set<elem_object_ptr> > elem_set;
+    typedef set_ptr< std::set<elem_object_ptr> > elem_set;
 
     elem_set _test_set()
     {
@@ -745,7 +745,7 @@ namespace test_map_key
     };
 
     typedef gc_ptr<elem_object> elem_object_ptr;
-    typedef map_container< std::map<elem_object_ptr, int32_t> > elem_map;
+    typedef map_ptr< std::map<elem_object_ptr, int32_t> > elem_map;
 
     elem_map _test_map_key()
     {
@@ -785,7 +785,7 @@ namespace test_map_value
     };
 
     typedef gc_ptr<elem_object> elem_object_ptr;
-    typedef map_container< std::map<int32_t, elem_object_ptr> > elem_map;
+    typedef map_ptr< std::map<int32_t, elem_object_ptr> > elem_map;
 
     elem_map _test_map_value()
     {
@@ -825,7 +825,7 @@ namespace test_map_key_value
     };
 
     typedef gc_ptr<elem_object> elem_object_ptr;
-    typedef map_container< std::map<elem_object_ptr, elem_object_ptr> > elem_map;
+    typedef map_ptr< std::map<elem_object_ptr, elem_object_ptr> > elem_map;
 
     elem_map _test_map_key_value()
     {
@@ -864,7 +864,7 @@ namespace test_vector_non_gc
         }
     };
 
-    typedef vector_container< std::vector<elem_object*> > elem_vector;
+    typedef vector_ptr< std::vector<elem_object*> > elem_vector;
 
     elem_vector _test_vector_non_gc(const std::vector<elem_object*>& store)
     {
@@ -907,8 +907,8 @@ namespace test_map_key_set
     };
 
     typedef gc_ptr<elem_object> elem_object_ptr;
-    typedef set_container< std::set<elem_object_ptr> > elem_set;
-    typedef map_container< std::map<elem_object_ptr, elem_set> > elem_map;
+    typedef set_ptr< std::set<elem_object_ptr> > elem_set;
+    typedef map_ptr< std::map<elem_object_ptr, elem_set> > elem_map;
 
     elem_map _test_map_key_set()
     {
@@ -954,7 +954,7 @@ namespace test_large_vector
     };
 
     typedef gc_ptr<elem_object> elem_object_ptr;
-    typedef vector_container< std::vector<elem_object_ptr> > elem_vector;
+    typedef vector_ptr< std::vector<elem_object_ptr> > elem_vector;
 
     elem_vector _test_large_vector()
     {
@@ -1149,7 +1149,7 @@ namespace test_thread_multiple_collection
     };
 
     typedef gc_ptr<elem_object> elem_object_ptr;
-    typedef map_container< std::map<elem_object_ptr, elem_object_ptr> > elem_map;
+    typedef map_ptr< std::map<elem_object_ptr, elem_object_ptr> > elem_map;
 
     elem_map _test_thread_multiple_collection()
     {
@@ -1205,7 +1205,7 @@ namespace test_thread_object_transfer
     };
 
     typedef gc_ptr<elem_object> elem_object_ptr;
-    typedef vector_container< std::vector<elem_object_ptr> > elem_vector;
+    typedef vector_ptr< std::vector<elem_object_ptr> > elem_vector;
 
     class master_object : public gc_object
     {

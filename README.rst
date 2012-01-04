@@ -193,8 +193,8 @@ you supply the collection type itself when creating::
     typedef gc_ptr<example_key> example_key_ptr;
     typedef gc_ptr<example_value> example_value_ptr;
 
-    typedef map_container< std::map<example_key_ptr, example_value_ptr> > std_map;
-    typedef set_container< boost::unordered_set<example_key_ptr> > boost_set;
+    typedef map_ptr< std::map<example_key_ptr, example_value_ptr> > std_map;
+    typedef set_ptr< boost::unordered_set<example_key_ptr> > boost_set;
 
     std_map example_map = new_map<std_map::map_type>();
     boost_set example_set = new_set<boost_set::set_type>();

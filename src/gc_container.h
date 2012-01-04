@@ -79,7 +79,7 @@ namespace lutze
     };
 
     template <class T>
-    class vector_container : public container_ptr< single_container<T> >
+    class vector_ptr : public container_ptr< single_container<T> >
     {
     public:
         typedef T vector_type;
@@ -92,11 +92,11 @@ namespace lutze
         typedef typename T::reverse_iterator reverse_iterator;
         typedef typename T::const_reverse_iterator const_reverse_iterator;
 
-        vector_container(single_container<T>* p = 0) : container_ptr< single_container<T> >(p)
+        vector_ptr(single_container<T>* p = 0) : container_ptr< single_container<T> >(p)
         {
         }
 
-        vector_container(const vector_container& rhs) : container_ptr< single_container<T> >(rhs)
+        vector_ptr(const vector_ptr& rhs) : container_ptr< single_container<T> >(rhs)
         {
         }
 
@@ -219,57 +219,57 @@ namespace lutze
     };
 
     template <class T>
-    vector_container<T> new_vector_placeholder(gc& gc, typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
+    vector_ptr<T> new_vector_placeholder(gc& gc, typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
     {
-        vector_container<T> container(new(gc) single_container<T>());
+        vector_ptr<T> container(new(gc) single_container<T>());
         container.resize(n, x);
         return container;
     }
 
     template <class T>
-    vector_container<T> new_vector(typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
+    vector_ptr<T> new_vector(typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
     {
         return new_vector_placeholder<T>(get_gc(), n, x);
     }
 
     template <class T>
-    vector_container<T> new_static_vector(typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
+    vector_ptr<T> new_static_vector(typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
     {
         return new_vector_placeholder<T>(get_static_gc(), n, x);
     }
 
     template <class T, class Iter>
-    vector_container<T> new_vector_placeholder(gc& gc, Iter first, Iter last)
+    vector_ptr<T> new_vector_placeholder(gc& gc, Iter first, Iter last)
     {
-        vector_container<T> container(new(gc) single_container<T>());
+        vector_ptr<T> container(new(gc) single_container<T>());
         container.assign(first, last);
         return container;
     }
 
     template <class T, class Iter>
-    vector_container<T> new_vector(Iter first, Iter last)
+    vector_ptr<T> new_vector(Iter first, Iter last)
     {
         return new_vector_placeholder<T>(get_gc(), first, last);
     }
 
     template <class T, class Iter>
-    vector_container<T> new_static_vector(Iter first, Iter last)
+    vector_ptr<T> new_static_vector(Iter first, Iter last)
     {
         return new_vector_placeholder<T>(get_static_gc(), first, last);
     }
 
     template <class T>
-    class deque_container : public vector_container<T>
+    class deque_ptr : public vector_ptr<T>
     {
     public:
         typedef T deque_type;
         typedef typename T::value_type value_type;
 
-        deque_container(single_container<T>* p = 0) : vector_container<T>(p)
+        deque_ptr(single_container<T>* p = 0) : vector_ptr<T>(p)
         {
         }
 
-        deque_container(const deque_container& rhs) : vector_container<T>(rhs)
+        deque_ptr(const deque_ptr& rhs) : vector_ptr<T>(rhs)
         {
         }
 
@@ -285,47 +285,47 @@ namespace lutze
     };
 
     template <class T>
-    deque_container<T> new_deque_placeholder(gc& gc, typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
+    deque_ptr<T> new_deque_placeholder(gc& gc, typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
     {
-        deque_container<T> container(new(gc) single_container<T>());
+        deque_ptr<T> container(new(gc) single_container<T>());
         container.resize(n, x);
         return container;
     }
 
     template <class T>
-    deque_container<T> new_deque(typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
+    deque_ptr<T> new_deque(typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
     {
         return new_deque_placeholder<T>(get_gc(), n, x);
     }
 
     template <class T>
-    deque_container<T> new_static_deque(typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
+    deque_ptr<T> new_static_deque(typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
     {
         return new_deque_placeholder<T>(get_static_gc(), n, x);
     }
 
     template <class T, class Iter>
-    deque_container<T> new_deque_placeholder(gc& gc, Iter first, Iter last)
+    deque_ptr<T> new_deque_placeholder(gc& gc, Iter first, Iter last)
     {
-        deque_container<T> container(new(gc) single_container<T>());
+        deque_ptr<T> container(new(gc) single_container<T>());
         container.assign(first, last);
         return container;
     }
 
     template <class T, class Iter>
-    deque_container<T> new_deque(Iter first, Iter last)
+    deque_ptr<T> new_deque(Iter first, Iter last)
     {
         return new_deque_placeholder<T>(get_gc(), first, last);
     }
 
     template <class T, class Iter>
-    deque_container<T> new_static_deque(Iter first, Iter last)
+    deque_ptr<T> new_static_deque(Iter first, Iter last)
     {
         return new_deque_placeholder<T>(get_static_gc(), first, last);
     }
 
     template <class T>
-    class list_container : public deque_container<T>
+    class list_ptr : public deque_ptr<T>
     {
     public:
         typedef T list_type;
@@ -333,21 +333,21 @@ namespace lutze
         typedef typename T::iterator iterator;
         typedef typename T::const_iterator const_iterator;
 
-        list_container(single_container<T>* p = 0) : deque_container<T>(p)
+        list_ptr(single_container<T>* p = 0) : deque_ptr<T>(p)
         {
         }
 
-        list_container(const list_container& rhs) : deque_container<T>(rhs)
+        list_ptr(const list_ptr& rhs) : deque_ptr<T>(rhs)
         {
         }
 
-        void merge(list_container& x)
+        void merge(list_ptr& x)
         {
             this->px->merge(*x);
         }
 
         template <class Comp>
-        void merge(list_container& x, Comp comp)
+        void merge(list_ptr& x, Comp comp)
         {
             this->px->merge(*x, comp);
         }
@@ -374,17 +374,17 @@ namespace lutze
             this->px->sort(comp);
         }
 
-        void splice(iterator position, list_container& x)
+        void splice(iterator position, list_ptr& x)
         {
             this->px->splice(position, *x);
         }
 
-        void splice(iterator position, list_container& x, iterator i)
+        void splice(iterator position, list_ptr& x, iterator i)
         {
             this->px->splice(position, *x, i);
         }
 
-        void splice(iterator position, list_container& x, iterator first, iterator last)
+        void splice(iterator position, list_ptr& x, iterator first, iterator last)
         {
             this->px->splice(position, *x, first, last);
         }
@@ -402,47 +402,47 @@ namespace lutze
     };
 
     template <class T>
-    list_container<T> new_list_placeholder(gc& gc, typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
+    list_ptr<T> new_list_placeholder(gc& gc, typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
     {
-        list_container<T> container(new(gc) single_container<T>());
+        list_ptr<T> container(new(gc) single_container<T>());
         container.resize(n, x);
         return container;
     }
 
     template <class T>
-    list_container<T> new_list(typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
+    list_ptr<T> new_list(typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
     {
         return new_list_placeholder<T>(get_gc(), n, x);
     }
 
     template <class T>
-    list_container<T> new_static_list(typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
+    list_ptr<T> new_static_list(typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
     {
         return new_list_placeholder<T>(get_static_gc(), n, x);
     }
 
     template <class T, class Iter>
-    list_container<T> new_list_placeholder(gc& gc, Iter first, Iter last)
+    list_ptr<T> new_list_placeholder(gc& gc, Iter first, Iter last)
     {
-        list_container<T> container(new(gc) single_container<T>());
+        list_ptr<T> container(new(gc) single_container<T>());
         container.assign(first, last);
         return container;
     }
 
     template <class T, class Iter>
-    list_container<T> new_list(Iter first, Iter last)
+    list_ptr<T> new_list(Iter first, Iter last)
     {
         return new_list_placeholder<T>(get_gc(), first, last);
     }
 
     template <class T, class Iter>
-    list_container<T> new_static_list(Iter first, Iter last)
+    list_ptr<T> new_static_list(Iter first, Iter last)
     {
         return new_list_placeholder<T>(get_static_gc(), first, last);
     }
 
     template <class T>
-    class set_container : public container_ptr< single_container<T> >
+    class set_ptr : public container_ptr< single_container<T> >
     {
     public:
         typedef T set_type;
@@ -453,11 +453,11 @@ namespace lutze
         typedef typename T::iterator iterator;
         typedef typename T::const_iterator const_iterator;
 
-        set_container(single_container<T>* p = 0) : container_ptr< single_container<T> >(p)
+        set_ptr(single_container<T>* p = 0) : container_ptr< single_container<T> >(p)
         {
         }
 
-        set_container(const set_container& rhs) : container_ptr< single_container<T> >(rhs)
+        set_ptr(const set_ptr& rhs) : container_ptr< single_container<T> >(rhs)
         {
         }
 
@@ -514,39 +514,39 @@ namespace lutze
     };
 
     template <class T>
-    set_container<T> new_set_placeholder(gc& gc)
+    set_ptr<T> new_set_placeholder(gc& gc)
     {
-        return set_container<T>(new(gc) single_container<T>());
+        return set_ptr<T>(new(gc) single_container<T>());
     }
 
     template <class T>
-    set_container<T> new_set()
+    set_ptr<T> new_set()
     {
         return new_set_placeholder<T>(get_gc());
     }
 
     template <class T>
-    set_container<T> new_static_set()
+    set_ptr<T> new_static_set()
     {
         return new_set_placeholder<T>(get_static_gc());
     }
 
     template <class T, class Iter>
-    set_container<T> new_set_placeholder(gc& gc, Iter first, Iter last)
+    set_ptr<T> new_set_placeholder(gc& gc, Iter first, Iter last)
     {
-        set_container<T> container(new(gc) single_container<T>());
+        set_ptr<T> container(new(gc) single_container<T>());
         container.insert(first, last);
         return container;
     }
 
     template <class T, class Iter>
-    set_container<T> new_set(Iter first, Iter last)
+    set_ptr<T> new_set(Iter first, Iter last)
     {
         return new_set_placeholder<T>(get_gc(), first, last);
     }
 
     template <class T, class Iter>
-    set_container<T> new_static_set(Iter first, Iter last)
+    set_ptr<T> new_static_set(Iter first, Iter last)
     {
         return new_set_placeholder<T>(get_static_gc(), first, last);
     }
@@ -566,7 +566,7 @@ namespace lutze
     };
 
     template <class T>
-    class map_container : public container_ptr< pair_container<T> >
+    class map_ptr : public container_ptr< pair_container<T> >
     {
     public:
         typedef T map_type;
@@ -577,11 +577,11 @@ namespace lutze
         typedef typename T::iterator iterator;
         typedef typename T::const_iterator const_iterator;
 
-        map_container(pair_container<T>* p = 0) : container_ptr< pair_container<T> >(p)
+        map_ptr(pair_container<T>* p = 0) : container_ptr< pair_container<T> >(p)
         {
         }
 
-        map_container(const map_container& rhs) : container_ptr< pair_container<T> >(rhs)
+        map_ptr(const map_ptr& rhs) : container_ptr< pair_container<T> >(rhs)
         {
         }
 
@@ -668,39 +668,39 @@ namespace lutze
     };
 
     template <class T>
-    map_container<T> new_map_placeholder(gc& gc)
+    map_ptr<T> new_map_placeholder(gc& gc)
     {
-        return map_container<T>(new(gc) pair_container<T>());
+        return map_ptr<T>(new(gc) pair_container<T>());
     }
 
     template <class T>
-    map_container<T> new_map()
+    map_ptr<T> new_map()
     {
         return new_map_placeholder<T>(get_gc());
     }
 
     template <class T>
-    map_container<T> new_static_map()
+    map_ptr<T> new_static_map()
     {
         return new_map_placeholder<T>(get_static_gc());
     }
 
     template <class T, class Iter>
-    map_container<T> new_map_placeholder(gc& gc, Iter first, Iter last)
+    map_ptr<T> new_map_placeholder(gc& gc, Iter first, Iter last)
     {
-        map_container<T> container(new(gc) pair_container<T>());
+        map_ptr<T> container(new(gc) pair_container<T>());
         container.insert(first, last);
         return container;
     }
 
     template <class T, class Iter>
-    map_container<T> new_map(Iter first, Iter last)
+    map_ptr<T> new_map(Iter first, Iter last)
     {
         return new_map_placeholder<T>(get_gc(), first, last);
     }
 
     template <class T, class Iter>
-    map_container<T> new_static_map(Iter first, Iter last)
+    map_ptr<T> new_static_map(Iter first, Iter last)
     {
         return new_map_placeholder<T>(get_static_gc(), first, last);
     }
