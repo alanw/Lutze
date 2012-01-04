@@ -7,7 +7,6 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/thread.hpp>
 #include "gc.h"
-#include "gc_ptr.h"
 #include "gc_container.h"
 
 using namespace lutze;

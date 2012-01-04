@@ -103,7 +103,6 @@ much.
 The smart pointer syntax is similar to using raw pointers::
 
     #include "gc.h"
-    #include "gc_ptr.h"
 
     using namespace gc;
 
@@ -149,7 +148,6 @@ Statically allocated gc objects are performed slightly differently since their
 lifetimes are managed differently::
 
     #include "gc.h"
-    #include "gc_ptr.h"
 
     using namespace gc;
 
@@ -174,7 +172,6 @@ In order to also support additional collections, such as boost::unordered_set,
 you supply the collection type itself when creating::
 
     #include "gc.h"
-    #include "gc_ptr.h"
     #include "gc_container.h"
 
     using namespace gc;
