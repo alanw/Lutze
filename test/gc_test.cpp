@@ -321,6 +321,8 @@ namespace member_collect
         BOOST_CHECK_NE(instance_count, 0);
         BOOST_CHECK_NE(child_count, 0);
         get_gc().collect(true);
+        get_gc().unmark(test->child1);
+        get_gc().unmark(test->child2);
         get_gc().unmark(test); // simulate out of scope
         return member_test_object_ptr();
     }
@@ -1157,6 +1159,11 @@ namespace test_thread_multiple_collection
         for (int32_t i = 0; i < 10; ++i)
             test.insert(std::make_pair(new_gc<elem_object>(), new_gc<elem_object>()));
         get_gc().collect(true);
+        for (elem_map::const_iterator elem = test.begin(), last = test.end(); elem != last; ++elem)
+        {
+            get_gc().unmark(elem->first);
+            get_gc().unmark(elem->second);
+        }
         get_gc().unmark(test); // simulate out of scope
         return test;
     }
