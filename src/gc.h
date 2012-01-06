@@ -52,10 +52,10 @@
 #elif defined(GC_PLATFORM_SPARC)
 
 #define GC_GET_STACK_EXTENTS(_gc, _stack, _size) \
-	jmp_buf __env; \
-	::setjmp(__env); \
-	asm ("mov %%sp, %0":"=r" (_stack)); \
-	_size = (uint32_t)(_gc->stack_top() - (uintptr_t)_stack);
+    jmp_buf __env; \
+    ::setjmp(__env); \
+    asm ("mov %%sp, %0":"=r" (_stack)); \
+    _size = (uint32_t)(_gc->stack_top() - (uintptr_t)_stack);
 
 #elif defined(GC_PLATFORM_POWERPC)
 
@@ -65,10 +65,10 @@
 register void* __sp __asm__("r1");
 
 #define GC_GET_STACK_EXTENTS(_gc, _stack, _size) \
-	jmp_buf __env; \
-	::setjmp(__env); \
-	_stack = (void*)__sp; \
-	_size = (uint32_t)(_gc->stack_top() - (uintptr_t)_stack);
+    jmp_buf __env; \
+    ::setjmp(__env); \
+    _stack = (void*)__sp; \
+    _size = (uint32_t)(_gc->stack_top() - (uintptr_t)_stack);
 
 #else
 
@@ -76,10 +76,10 @@ register void* __sp __asm__("r1");
 #include <setjmp.h>
 
 #define GC_GET_STACK_EXTENTS(_gc, _stack, _size) \
-	jmp_buf __env; \
-	::setjmp(__env); \
-	_stack = &__env; \
-	_size = (uint32_t)(_gc->stack_top() - (uintptr_t)_stack); \
+    jmp_buf __env; \
+    ::setjmp(__env); \
+    _stack = &__env; \
+    _size = (uint32_t)(_gc->stack_top() - (uintptr_t)_stack); \
 
 #endif
 
@@ -121,8 +121,9 @@ namespace lutze
 
     public:
         void* operator new (size_t size, gc& gc);
-        void operator delete (void* p);
+        void* operator new (size_t size, void* p = 0);
         void operator delete (void* p, gc& gc);
+        void operator delete (void* p);
 
         friend class gc;
     };
@@ -513,6 +514,11 @@ namespace lutze
         void* pobj = ::operator new(size);
         gc.register_object(static_cast<gc_object*>(pobj));
         return pobj;
+    }
+
+    void* gc_object::operator new (size_t size, void* p)
+    {
+        return gc_object::operator new(size, get_gc());
     }
 
     void gc_object::operator delete (void* p, gc& gc)
