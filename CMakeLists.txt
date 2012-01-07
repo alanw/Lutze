@@ -13,12 +13,14 @@ find_package(Threads REQUIRED)
 find_package(Boost REQUIRED COMPONENTS thread)
 
 include_directories(
-	src
+	include
 	${Boost_INCLUDE_DIRS}
 )
 
 set (gc_SOURCES
-	test/gc_main.cpp
+	src/gc.cpp
+    src/gc_object.cpp
+    test/gc_main.cpp
 	test/gc_test.cpp
 )
 

@@ -15,6 +15,7 @@
 #include <boost/preprocessor/punctuation.hpp>
 #include <boost/preprocessor/repetition.hpp>
 #include <boost/preprocessor/arithmetic.hpp>
+#include "gc_object.h"
 #include "gc_ptr.h"
 
 #define _GC_VERSION "1.0.2"
@@ -102,31 +103,8 @@ namespace lutze
     static const uint32_t register_threshold = 200;
     static const uint32_t transfer_threshold = 100;
 
-    class gc;
+    class gc; // todo: can this go inside the class?
     typedef std::set<gc*> gc_set;
-
-    // all garbage collected classes must be derived from this base class
-    class gc_object
-    {
-    public:
-        virtual ~gc_object()
-        {
-        }
-
-    protected:
-        virtual void mark_members(gc* gc) const
-        {
-            // override
-        }
-
-    public:
-        void* operator new (size_t size, gc& gc);
-        void* operator new (size_t size, void* p = 0);
-        void operator delete (void* p, gc& gc);
-        void operator delete (void* p);
-
-        friend class gc;
-    };
 
     class gc
     {
@@ -487,9 +465,6 @@ namespace lutze
         }
     };
 
-    boost::mutex gc::gc_registry_mutex;
-    gc_set gc::gc_registry;
-
     static gc& get_gc()
     {
         static boost::thread_specific_ptr<gc> thread_gc(gc::unregister_gc);
@@ -507,30 +482,6 @@ namespace lutze
         if (static_gc == NULL)
             static_gc = new gc(true);
         return *static_gc;
-    }
-
-    void* gc_object::operator new (size_t size, gc& gc)
-    {
-        void* pobj = ::operator new(size);
-        gc.register_object(static_cast<gc_object*>(pobj));
-        return pobj;
-    }
-
-    void* gc_object::operator new (size_t size, void* p)
-    {
-        return gc_object::operator new(size, get_gc());
-    }
-
-    void gc_object::operator delete (void* p, gc& gc)
-    {
-        gc_object* pobj = static_cast<gc_object*>(p);
-        gc.unregister_object(pobj);
-        ::operator delete(pobj);
-    }
-
-    void gc_object::operator delete (void* p)
-    {
-        gc_object::operator delete(p, get_gc());
     }
 
     // This expands to...
