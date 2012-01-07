@@ -24,22 +24,6 @@ set (gc_SOURCES
 	test/gc_test.cpp
 )
 
-if (APPLE)
-    add_definitions(-D_MAC)
-elseif (WIN32)
-    add_definitions(-D_WIN32)
-elseif (UNIX)
-    add_definitions(-DLINUX)
-elseif (CMAKE_SYSTEM_NAME MATCHES "(Solaris|SunOS)")
-    add_definitions(-D__sun)
-endif()
-
-if (CMAKE_SYSTEM_PROCESSOR MATCHES "sparc")
-    add_definitions(-D__sparc__)
-elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "powerpc")
-    add_definitions(-D__powerpc__)
-endif()
-
 add_executable(
 	gc_test
     ${gc_SOURCES}

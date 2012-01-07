@@ -20,10 +20,10 @@
 
 #define _GC_VERSION "1.0.2"
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32) || defined(_WIN64) || defined(BOOST_THREAD_WIN32)
 #define GC_PLATFORM_WINDOWS
 #endif
-#if defined(__SVR4) && defined(__sun)
+#if defined(__SVR4) && defined(__sun) || defined(BOOST_THREAD_SOLARIS)
 #define GC_PLATFORM_SOLARIS
 #endif
 #if defined(__sparc__) || defined(__sparc)
@@ -32,10 +32,10 @@
 #if defined(__ppc__) || defined(__powerpc__) || (__ppc64__) || (__powerpc64__)
 #define GC_PLATFORM_POWERPC
 #endif
-#if defined(_MAC)
+#if defined(_MAC) || defined(BOOST_THREAD_MACOS)
 #define GC_PLATFORM_MAC
 #endif
-#if defined(LINUX)
+#if defined(LINUX) || defined(BOOST_THREAD_LINUX)
 #define GC_PLATFORM_LINUX
 #endif
 
