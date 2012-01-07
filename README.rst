@@ -1,7 +1,7 @@
 Lutze C++ Garbage Collector
 ===========================
 
-Welcome to the Lu-Tze C++ Garbage Collector version **1.0.2**.
+Welcome to the Lu-Tze C++ Garbage Collector version **1.1.0**.
 
 For Terry Pratchett fans, `Lu-Tze <http://en.wikipedia.org/wiki/History_Monks#Lu-Tze>`_
 is a familiar figure, however for the uninitiated, the character is known for
@@ -33,7 +33,6 @@ Features
 * Does not stop the (entire) world when performing collections.
 * Destructors called when objects are destroyed.
 * Works well with unmanaged objects.
-* All code contained in header files - just #include to start using!
 
 
 Rules
@@ -41,7 +40,7 @@ Rules
 
 Because there has to be some rules, right?
 
-* All garbage collected (managed) objects must derive from gc::gc_object
+* All garbage collected (managed) objects must derive from lutze::gc_object
 * The mark_members() method must be overridden to mark all member gc_object
   pointers.
 * Care must be taken to ensure destructors do not contain non-trivial code,
@@ -53,11 +52,11 @@ Because there has to be some rules, right?
 Usage
 -----
 
-All garbage collected objects must be derived from gc::gc_object::
+All garbage collected objects must be derived from lutze::gc_object::
 
     #include "gc.h"
 
-    using namespace gc;
+    using namespace lutze;
 
     class example_object : public gc_object
     {
@@ -104,7 +103,7 @@ The smart pointer syntax is similar to using raw pointers::
 
     #include "gc.h"
 
-    using namespace gc;
+    using namespace lutze;
 
     class example_object;
     typedef gc_ptr<example_object> example_object_ptr;
@@ -149,7 +148,7 @@ lifetimes are managed differently::
 
     #include "gc.h"
 
-    using namespace gc;
+    using namespace lutze;
 
     example_object_ptr example_ptr = new_static_gc<example_object>();
 
@@ -174,7 +173,7 @@ you supply the collection type itself when creating::
     #include "gc.h"
     #include "gc_container.h"
 
-    using namespace gc;
+    using namespace lutze;
 
     class example_key : public gc_object
     {
