@@ -4,8 +4,8 @@
 // or the GNU Lesser General Public License.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef _GC_PTR
-#define _GC_PTR
+#ifndef _LUTZE_GC_PTR
+#define _LUTZE_GC_PTR
 
 namespace lutze
 {

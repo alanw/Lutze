@@ -4,8 +4,8 @@
 // or the GNU Lesser General Public License.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef _GC
-#define _GC
+#ifndef _LUTZE_GC
+#define _LUTZE_GC
 
 #include <set>
 #include <boost/cstdint.hpp>

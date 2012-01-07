@@ -7,8 +7,8 @@
 #include <boost/type_traits.hpp>
 #include <boost/utility/enable_if.hpp>
 
-#ifndef _GC_CONTAINER
-#define _GC_CONTAINER
+#ifndef _LUTZE_GC_CONTAINER
+#define _LUTZE_GC_CONTAINER
 
 #include "gc.h"
 
