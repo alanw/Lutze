@@ -11,6 +11,21 @@
 
 using namespace lutze;
 
+class global_fixture
+{
+public:
+    global_fixture() // setup
+    {
+    }
+
+    virtual ~global_fixture() // teardown
+    {
+        gc::unregister_gc(&get_static_gc());
+    }
+};
+
+BOOST_GLOBAL_FIXTURE(global_fixture);
+
 class collection_fixture
 {
 public:
@@ -406,6 +421,7 @@ namespace non_gc_collect
         BOOST_CHECK_NE(managed_count, 0);
         BOOST_CHECK_NE(unmanaged_count, 0);
         get_gc().collect(true);
+        get_gc().unmark(test->child1);
         get_gc().unmark(test); // simulate out of scope
         return member_test_object_ptr();
     }
@@ -716,6 +732,8 @@ namespace test_set
             test.insert(new_gc<elem_object>());
         BOOST_CHECK_EQUAL(instance_count, 100);
         get_gc().collect(true);
+        for (elem_set::const_iterator elem = test.begin(), last = test.end(); elem != last; ++elem)
+            get_gc().unmark(*elem);
         get_gc().unmark(test); // simulate out of scope
         return elem_set();
     }
@@ -756,6 +774,8 @@ namespace test_map_key
             test.insert(std::make_pair(new_gc<elem_object>(), i));
         BOOST_CHECK_EQUAL(instance_count, 100);
         get_gc().collect(true);
+        for (elem_map::const_iterator elem = test.begin(), last = test.end(); elem != last; ++elem)
+            get_gc().unmark(elem->first);
         get_gc().unmark(test); // simulate out of scope
         return elem_map();
     }
@@ -796,6 +816,8 @@ namespace test_map_value
             test.insert(std::make_pair(i, new_gc<elem_object>()));
         BOOST_CHECK_EQUAL(instance_count, 10);
         get_gc().collect(true);
+        for (elem_map::const_iterator elem = test.begin(), last = test.end(); elem != last; ++elem)
+            get_gc().unmark(elem->second);
         get_gc().unmark(test); // simulate out of scope
         return elem_map();
     }
@@ -836,6 +858,11 @@ namespace test_map_key_value
             test.insert(std::make_pair(new_gc<elem_object>(), new_gc<elem_object>()));
         BOOST_CHECK_EQUAL(instance_count, 20);
         get_gc().collect(true);
+        for (elem_map::const_iterator elem = test.begin(), last = test.end(); elem != last; ++elem)
+        {
+            get_gc().unmark(elem->first);
+            get_gc().unmark(elem->second);
+        }
         get_gc().unmark(test); // simulate out of scope
         return elem_map();
     }
@@ -924,7 +951,13 @@ namespace test_map_key_set
 
         }
         BOOST_CHECK_EQUAL(instance_count, 110);
-        get_gc().collect(true);
+        for (elem_map::const_iterator elem = test.begin(), last = test.end(); elem != last; ++elem)
+        {
+            get_gc().unmark(elem->first);
+            for (elem_set::const_iterator testelem = elem->second->begin(), last = elem->second->end(); testelem != last; ++testelem)
+                get_gc().unmark(*testelem);
+            get_gc().unmark(elem->second);
+        }
         get_gc().unmark(test); // simulate out of scope
         return elem_map();
     }
@@ -965,6 +998,8 @@ namespace test_large_vector
             test.push_back(new_gc<elem_object>());
         BOOST_CHECK_EQUAL(instance_count, 10000);
         get_gc().collect(true);
+        for (elem_vector::const_iterator elem = test.begin(), last = test.end(); elem != last; ++elem)
+            get_gc().unmark(*elem);
         get_gc().unmark(test); // simulate out of scope
         return elem_vector();
     }

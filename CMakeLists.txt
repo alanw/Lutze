@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 
 project (gc)
-set (gc_VERSION_MAJOR 0)
+set (gc_VERSION_MAJOR 1)
 set (gc_VERSION_MINOR 1)
 set (gc_VERSION_PATCH 0)
 set (gc_VERSION "${gc_VERSION_MAJOR}.${gc_VERSION_MINOR}.${gc_VERSION_PATCH}")
@@ -13,19 +13,19 @@ find_package(Threads REQUIRED)
 find_package(Boost REQUIRED COMPONENTS thread)
 
 include_directories(
-	include
-	${Boost_INCLUDE_DIRS}
+    include
+    ${Boost_INCLUDE_DIRS}
 )
 
 set (gc_SOURCES
-	src/gc.cpp
+    src/gc.cpp
     src/gc_object.cpp
     test/gc_main.cpp
-	test/gc_test.cpp
+    test/gc_test.cpp
 )
 
 add_executable(
-	gc_test
+    gc_test
     ${gc_SOURCES}
 )
 
