@@ -16,11 +16,12 @@ class global_fixture
 public:
     global_fixture() // setup
     {
+        gc::init();
     }
 
     virtual ~global_fixture() // teardown
     {
-        gc::unregister_gc(&get_static_gc());
+        gc::gc_term();
     }
 };
 

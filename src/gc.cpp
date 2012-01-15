@@ -98,9 +98,24 @@ namespace lutze
     {
         return _GC_VERSION;
     }
-
+    
+    bool gc::gc_init()
+    {
+        static bool initialized = false;
+        bool prev_init = initialized;
+        initialized = true;
+        return prev_init;
+    }
+    
+    void gc::gc_term()
+    {
+        unregister_gc(&get_static_gc());
+    }
+    
     void gc::register_gc(gc* pgc)
     {
+        if (!gc_init())
+            boost::throw_exception(std::runtime_error("gc_init() must be called"));
         boost::mutex::scoped_lock lock(gc_registry_mutex);
         gc_registry.insert(pgc);
     }

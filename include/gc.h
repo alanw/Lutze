@@ -57,6 +57,12 @@ namespace lutze
     public:
         // return current lutze gc version
         static std::string gc_version();
+        
+        // initialize lutze garbage collector
+        static bool gc_init();
+        
+        // terminate and clean up lutze garbage collector
+        static void gc_term();
 
         // register gc instance at thread launch
         static void register_gc(gc* pgc);
@@ -95,7 +101,7 @@ namespace lutze
         template <class OBJ>
         void mark(const gc_ptr<OBJ>& obj)
         {
-            mark_object(obj.get());
+            mark_object(reinterpret_cast<gc_object*>(obj.get()));
         }
 
         // a default unmark function called for pod types
