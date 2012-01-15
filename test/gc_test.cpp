@@ -16,7 +16,7 @@ class global_fixture
 public:
     global_fixture() // setup
     {
-        gc::init();
+        gc::gc_init();
     }
 
     virtual ~global_fixture() // teardown

@@ -57,10 +57,10 @@ namespace lutze
     public:
         // return current lutze gc version
         static std::string gc_version();
-        
+
         // initialize lutze garbage collector
         static bool gc_init();
-        
+
         // terminate and clean up lutze garbage collector
         static void gc_term();
 
@@ -122,7 +122,7 @@ namespace lutze
         template <class OBJ>
         void unmark(const gc_ptr<OBJ>& obj)
         {
-            unmark_object(obj.get());
+            unmark_object(reinterpret_cast<gc_object*>(obj.get()));
         }
 
         // perform garbage collection (can force collection which ignores thresholds)

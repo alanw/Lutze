@@ -6,7 +6,7 @@
 
 #include "gc.h"
 
-#define _GC_VERSION "1.1.0"
+#define _GC_VERSION "2.0.0"
 
 #if defined(_WIN32) || defined(_WIN64) || defined(BOOST_THREAD_WIN32)
 #define GC_PLATFORM_WINDOWS
@@ -98,7 +98,7 @@ namespace lutze
     {
         return _GC_VERSION;
     }
-    
+
     bool gc::gc_init()
     {
         static bool initialized = false;
@@ -106,12 +106,12 @@ namespace lutze
         initialized = true;
         return prev_init;
     }
-    
+
     void gc::gc_term()
     {
         unregister_gc(&get_static_gc());
     }
-    
+
     void gc::register_gc(gc* pgc)
     {
         if (!gc_init())

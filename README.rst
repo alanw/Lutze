@@ -1,7 +1,7 @@
 Lutze C++ Garbage Collector
 ===========================
 
-Welcome to the Lu-Tze C++ Garbage Collector version **1.1.0**.
+Welcome to the Lu-Tze C++ Garbage Collector version **2.0.0**.
 
 For Terry Pratchett fans, `Lu-Tze <http://en.wikipedia.org/wiki/History_Monks#Lu-Tze>`_
 is a familiar figure, however for the uninitiated, the character is known for
@@ -40,6 +40,7 @@ Rules
 
 Because there has to be some rules, right?
 
+* You must first call gc::gc_init() to initialize the garbage collector.
 * All garbage collected (managed) objects must derive from lutze::gc_object
 * The mark_members() method must be overridden to mark all member gc_object
   pointers.
@@ -80,6 +81,8 @@ All garbage collected objects must be derived from lutze::gc_object::
         std::string member1; // unmanaged member is ok
         example_object* member2; // managed member
     };
+
+    gc_init();
 
     ...
 
@@ -130,6 +133,8 @@ The smart pointer syntax is similar to using raw pointers::
         std::string member1; // unmanaged member is ok
         example_object_ptr member2; // managed member
     };
+
+    gc_init();
 
     ...
 
@@ -195,6 +200,10 @@ you supply the collection type itself when creating::
     typedef map_ptr< std::map<example_key_ptr, example_value_ptr> > std_map;
     typedef set_ptr< boost::unordered_set<example_key_ptr> > boost_set;
 
+    gc_init();
+
+    ...
+
     std_map example_map = new_map<std_map::map_type>();
     boost_set example_set = new_set<boost_set::set_type>();
 
@@ -255,6 +264,9 @@ such as boost::unordered_map.
 
 For Windows users, `BoostPro <http://www.boostpro.com>`_ has some pre-compiled
 packages that make using Boost libraries easier.
+
+Note: In order to avoid false reporting of memory leaks when debugging in
+Windows, call gc::gc_term() before exit to clean up.
 
 
 Acknowledgments
