@@ -82,7 +82,7 @@ All garbage collected objects must be derived from lutze::gc_object::
         example_object* member2; // managed member
     };
 
-    gc_init();
+    gc::gc_init();
 
     ...
 
@@ -134,7 +134,7 @@ The smart pointer syntax is similar to using raw pointers::
         example_object_ptr member2; // managed member
     };
 
-    gc_init();
+    gc::gc_init();
 
     ...
 
@@ -200,7 +200,7 @@ you supply the collection type itself when creating::
     typedef map_ptr< std::map<example_key_ptr, example_value_ptr> > std_map;
     typedef set_ptr< boost::unordered_set<example_key_ptr> > boost_set;
 
-    gc_init();
+    gc::gc_init();
 
     ...
 
