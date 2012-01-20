@@ -306,7 +306,7 @@ namespace lutze
         if (node == object_registry.end()) // object does not belong to this gc registry
         {
             node_map::iterator input = release_queue.find(ptr);
-            if (node == object_registry.end())
+            if (input == release_queue.end())
                 return;
             node = object_registry.insert(std::make_pair(ptr, gc_node(pobj))).first;
             release_queue.erase(input); // take ownership
@@ -314,7 +314,7 @@ namespace lutze
         if (mark_token != node->second.mark_token)
         {
             node->second.mark_token = mark_token;
-            pobj->mark_members(this);
+            node->second.object->mark_members(this);
         }
     }
 

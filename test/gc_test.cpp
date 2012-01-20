@@ -1230,91 +1230,85 @@ namespace test_thread_object_transfer
 {
     boost::mutex instance_mutex;
     int32_t instance_count = 0;
+    int32_t child_count = 0;
 
-    class elem_object : public gc_object
+    class test_object : public gc_object
     {
     public:
-        elem_object()
+        test_object()
+        {
+            boost::mutex::scoped_lock lock(instance_mutex);
+            ++child_count;
+        }
+
+        virtual ~test_object()
+        {
+            boost::mutex::scoped_lock lock(instance_mutex);
+            --child_count;
+        }
+    };
+
+    typedef gc_ptr<test_object> test_object_ptr;
+
+    class member_test_object : public gc_object
+    {
+    public:
+        member_test_object()
         {
             boost::mutex::scoped_lock lock(instance_mutex);
             ++instance_count;
+
         }
 
-        virtual ~elem_object()
+        virtual ~member_test_object()
         {
             boost::mutex::scoped_lock lock(instance_mutex);
             --instance_count;
         }
+
+        test_object_ptr child1;
+        test_object_ptr child2;
+
+        void create_child1()
+        {
+            child1 = new_gc<test_object>();
+        }
+
+        void create_child2()
+        {
+            child2 = new_gc<test_object>();
+        }
+
+        virtual void mark_members(gc* gc) const
+        {
+            gc->mark(child1);
+            gc->mark(child2);
+        }
     };
 
-    typedef gc_ptr<elem_object> elem_object_ptr;
-    typedef vector_ptr< std::vector<elem_object_ptr> > elem_vector;
+    typedef gc_ptr<member_test_object> member_test_object_ptr;
 
-    class master_object : public gc_object
+    void thread_func(member_test_object_ptr test)
     {
-    public:
-        master_object()
-        {
-            boost::mutex::scoped_lock lock(instance_mutex);
-            ++instance_count;
-        }
-
-        virtual ~master_object()
-        {
-            boost::mutex::scoped_lock lock(instance_mutex);
-            --instance_count;
-        }
-
-        void create_elements()
-        {
-            boost::mutex::scoped_lock lock(element_mutex);
-            elements = new_vector<elem_vector::vector_type>(10);
-            for (int32_t i = 0; i < 10; ++i)
-                elements[i] = new_gc<elem_object>();
-        }
-
-        void swap_elements(elem_vector dest)
-        {
-            boost::mutex::scoped_lock lock(element_mutex);
-            for (int32_t i = 0; i < 10; ++i)
-                std::swap(elements[i], dest[i]);
-        }
-
-        boost::mutex element_mutex;
-        elem_vector elements;
-    };
-
-    typedef gc_ptr<master_object> master_object_ptr;
-
-    void first_func(master_object_ptr first)
-    {
-        first->create_elements();
-        boost::this_thread::sleep(boost::posix_time::milliseconds(200));
+        test->create_child2();
     }
 
-    void second_func(master_object_ptr first, master_object_ptr second)
+    member_test_object_ptr _test_thread_object_transfer()
     {
-        second->create_elements();
-        boost::this_thread::sleep(boost::posix_time::milliseconds(50));
-        second->swap_elements(first->elements);
-        boost::this_thread::sleep(boost::posix_time::milliseconds(200));
-    }
+        member_test_object_ptr test = new_gc<member_test_object>();
+        BOOST_CHECK_NE(instance_count, 0);
+        BOOST_CHECK_EQUAL(child_count, 0);
+        test->create_child1();
 
-    void _test_thread_object_transfer()
-    {
-        master_object_ptr first = new_gc<master_object>();
-        boost::thread first_thread(first_func, first);
+        boost::thread test_thread(thread_func, test);
+        boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+        test_thread.join();
 
-        master_object_ptr second = new_gc<master_object>();
-        boost::thread second_thread(second_func, first, second);
-
-        boost::this_thread::sleep(boost::posix_time::milliseconds(400));
-
-        first_thread.join();
-        second_thread.join();
-
-        get_gc().unmark(first); // simulate out of scope
-        get_gc().unmark(second); // simulate out of scope
+        get_gc().collect(true);
+        get_gc().unmark(test->child1);
+        get_gc().unmark(test->child2);
+        get_gc().unmark(test); // simulate out of scope
+        return member_test_object_ptr();
     }
 
     BOOST_AUTO_TEST_CASE(test_thread_object_transfer)
@@ -1322,6 +1316,7 @@ namespace test_thread_object_transfer
         _test_thread_object_transfer();
         get_gc().collect(true);
         BOOST_CHECK_EQUAL(instance_count, 0);
+        BOOST_CHECK_EQUAL(child_count, 0);
     }
 }
 
