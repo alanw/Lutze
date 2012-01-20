@@ -6,7 +6,7 @@
 
 #include "gc.h"
 
-#define _GC_VERSION "2.0.0"
+#define _GC_VERSION "2.0.1"
 
 #if defined(_WIN32) || defined(_WIN64) || defined(BOOST_THREAD_WIN32)
 #define GC_PLATFORM_WINDOWS
