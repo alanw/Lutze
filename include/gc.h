@@ -16,11 +16,29 @@
 #include <boost/preprocessor/punctuation.hpp>
 #include <boost/preprocessor/repetition.hpp>
 #include <boost/preprocessor/arithmetic.hpp>
-#include "gc_object.h"
 #include "gc_ptr.h"
 
 namespace lutze
 {
+    class gc;
+
+    // all garbage collected classes must be derived from this base class
+    class gc_object
+    {
+    public:
+        virtual ~gc_object()
+        {
+        }
+
+    protected:
+        virtual void mark_members(gc* gc) const
+        {
+            // override
+        }
+
+        friend class gc;
+    };
+
     class gc
     {
     public:
@@ -70,6 +88,12 @@ namespace lutze
         // unregister gc instance after thread termination
         static void unregister_gc(gc* pgc);
 
+        // retrieve the gc instance for current thread
+        static gc& get_gc();
+
+        // retrieve the static gc instance for current thread
+        static gc& get_static_gc();
+
         // register new object in this gc instance
         inline void register_object(const gc_object* pobj)
         {
@@ -92,13 +116,6 @@ namespace lutze
 
         // mark object pointer as reachable
         template <class OBJ>
-        void mark(OBJ* obj)
-        {
-            mark_object(reinterpret_cast<gc_object*>(obj));
-        }
-
-        // mark object pointer as reachable
-        template <class OBJ>
         void mark(const gc_ptr<OBJ>& obj)
         {
             mark_object(reinterpret_cast<gc_object*>(obj.get()));
@@ -109,13 +126,6 @@ namespace lutze
         void unmark(OBJ obj)
         {
             // do nothing
-        }
-
-        // mark object pointer as unreachable (used to force out of scope)
-        template <class OBJ>
-        void unmark(OBJ* obj)
-        {
-            unmark_object(reinterpret_cast<gc_object*>(obj));
         }
 
         // mark object pointer as unreachable (used to force out of scope)
@@ -169,49 +179,34 @@ namespace lutze
         void transfer(const node_map& transfer_nodes);
     };
 
-    // function for retrieving the gc instance for current thread
-    static gc& get_gc()
-    {
-        static boost::thread_specific_ptr<gc> thread_gc(gc::unregister_gc);
-        if (thread_gc.get() == NULL)
-        {
-            thread_gc.reset(new gc);
-            gc::register_gc(thread_gc.get());
-        }
-        return *thread_gc.get();
-    }
-
-    // function for retrieving the static gc instance for current thread
-    static gc& get_static_gc()
-    {
-        static gc* static_gc = NULL;
-        if (static_gc == NULL)
-            static_gc = new gc(true);
-        return *static_gc;
-    }
-
-    // This expands to...
+    // The following expands to...
     // template <class T, class A1, ...etc>
     // gc_ptr<T> new_gc(A1 const& a1, ...etc)
     // {
-    //     return new_gc_placeholder<T>(get_gc(), a1, ...etc);
+    //     return new_gc_placeholder<T>(gc::get_gc(), a1, ...etc);
     // }
 
     // template <class T, class A1, ...etc>
     // gc_ptr<T> new_static_gc(A1 const& a1, ...etc)
     // {
-    //     return new_gc_placeholder<T>(get_static_gc(), a1, ...etc);
+    //     return new_gc_placeholder<T>(gc::get_static_gc(), a1, ...etc);
     // }
+
     #define NEW_GC(Z, N, _) \
     template<class T BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, class A)> \
     gc_ptr<T> new_gc_placeholder(gc& gc BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, const A, & a)) \
-    { gc_ptr<T> obj(new(gc) T(BOOST_PP_ENUM_PARAMS(N, a))); gc.collect(); return obj; } \
+    { \
+        T* pobj = new T(BOOST_PP_ENUM_PARAMS(N, a)); \
+        gc.register_object(static_cast<gc_object*>(pobj)); \
+        gc.collect(); \
+        return gc_ptr<T>(pobj); \
+    } \
     template<class T BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, class A)> \
     gc_ptr<T> new_gc(BOOST_PP_ENUM_BINARY_PARAMS(N, const A, & a)) \
-    { return new_gc_placeholder<T>(get_gc() BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)); } \
+    { return new_gc_placeholder<T>(gc::get_gc() BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)); } \
     template<class T BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, class A)> \
     gc_ptr<T> new_static_gc(BOOST_PP_ENUM_BINARY_PARAMS(N, const A, & a)) \
-    { return new_gc_placeholder<T>(get_static_gc() BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)); }
+    { return new_gc_placeholder<T>(gc::get_static_gc() BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)); }
     BOOST_PP_REPEAT_2ND(BOOST_PP_INC(9), NEW_GC, _)
 }
 

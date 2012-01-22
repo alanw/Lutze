@@ -221,7 +221,8 @@ namespace lutze
     template <class T>
     vector_ptr<T> new_vector_placeholder(gc& gc, typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
     {
-        vector_ptr<T> container(new(gc) single_container<T>());
+        vector_ptr<T> container(new single_container<T>());
+        gc.register_object(static_cast<gc_object*>(container.get()));
         container.resize(n, x);
         return container;
     }
@@ -229,19 +230,20 @@ namespace lutze
     template <class T>
     vector_ptr<T> new_vector(typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
     {
-        return new_vector_placeholder<T>(get_gc(), n, x);
+        return new_vector_placeholder<T>(gc::get_gc(), n, x);
     }
 
     template <class T>
     vector_ptr<T> new_static_vector(typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
     {
-        return new_vector_placeholder<T>(get_static_gc(), n, x);
+        return new_vector_placeholder<T>(gc::get_static_gc(), n, x);
     }
 
     template <class T, class Iter>
     vector_ptr<T> new_vector_placeholder(gc& gc, Iter first, Iter last)
     {
-        vector_ptr<T> container(new(gc) single_container<T>());
+        vector_ptr<T> container(new single_container<T>());
+        gc.register_object(static_cast<gc_object*>(container.get()));
         container.assign(first, last);
         return container;
     }
@@ -249,13 +251,13 @@ namespace lutze
     template <class T, class Iter>
     vector_ptr<T> new_vector(Iter first, Iter last)
     {
-        return new_vector_placeholder<T>(get_gc(), first, last);
+        return new_vector_placeholder<T>(gc::get_gc(), first, last);
     }
 
     template <class T, class Iter>
     vector_ptr<T> new_static_vector(Iter first, Iter last)
     {
-        return new_vector_placeholder<T>(get_static_gc(), first, last);
+        return new_vector_placeholder<T>(gc::get_static_gc(), first, last);
     }
 
     template <class T>
@@ -287,7 +289,8 @@ namespace lutze
     template <class T>
     deque_ptr<T> new_deque_placeholder(gc& gc, typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
     {
-        deque_ptr<T> container(new(gc) single_container<T>());
+        deque_ptr<T> container(new single_container<T>());
+        gc.register_object(static_cast<gc_object*>(container.get()));
         container.resize(n, x);
         return container;
     }
@@ -295,19 +298,20 @@ namespace lutze
     template <class T>
     deque_ptr<T> new_deque(typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
     {
-        return new_deque_placeholder<T>(get_gc(), n, x);
+        return new_deque_placeholder<T>(gc::get_gc(), n, x);
     }
 
     template <class T>
     deque_ptr<T> new_static_deque(typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
     {
-        return new_deque_placeholder<T>(get_static_gc(), n, x);
+        return new_deque_placeholder<T>(gc::get_static_gc(), n, x);
     }
 
     template <class T, class Iter>
     deque_ptr<T> new_deque_placeholder(gc& gc, Iter first, Iter last)
     {
-        deque_ptr<T> container(new(gc) single_container<T>());
+        deque_ptr<T> container(new single_container<T>());
+        gc.register_object(static_cast<gc_object*>(container.get()));
         container.assign(first, last);
         return container;
     }
@@ -315,13 +319,13 @@ namespace lutze
     template <class T, class Iter>
     deque_ptr<T> new_deque(Iter first, Iter last)
     {
-        return new_deque_placeholder<T>(get_gc(), first, last);
+        return new_deque_placeholder<T>(gc::get_gc(), first, last);
     }
 
     template <class T, class Iter>
     deque_ptr<T> new_static_deque(Iter first, Iter last)
     {
-        return new_deque_placeholder<T>(get_static_gc(), first, last);
+        return new_deque_placeholder<T>(gc::get_static_gc(), first, last);
     }
 
     template <class T>
@@ -404,7 +408,8 @@ namespace lutze
     template <class T>
     list_ptr<T> new_list_placeholder(gc& gc, typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
     {
-        list_ptr<T> container(new(gc) single_container<T>());
+        list_ptr<T> container(new single_container<T>());
+        gc.register_object(static_cast<gc_object*>(container.get()));
         container.resize(n, x);
         return container;
     }
@@ -412,19 +417,20 @@ namespace lutze
     template <class T>
     list_ptr<T> new_list(typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
     {
-        return new_list_placeholder<T>(get_gc(), n, x);
+        return new_list_placeholder<T>(gc::get_gc(), n, x);
     }
 
     template <class T>
     list_ptr<T> new_static_list(typename T::size_type n = 0, const typename T::value_type& x = typename T::value_type())
     {
-        return new_list_placeholder<T>(get_static_gc(), n, x);
+        return new_list_placeholder<T>(gc::get_static_gc(), n, x);
     }
 
     template <class T, class Iter>
     list_ptr<T> new_list_placeholder(gc& gc, Iter first, Iter last)
     {
-        list_ptr<T> container(new(gc) single_container<T>());
+        list_ptr<T> container(new single_container<T>());
+        gc.register_object(static_cast<gc_object*>(container.get()));
         container.assign(first, last);
         return container;
     }
@@ -432,13 +438,13 @@ namespace lutze
     template <class T, class Iter>
     list_ptr<T> new_list(Iter first, Iter last)
     {
-        return new_list_placeholder<T>(get_gc(), first, last);
+        return new_list_placeholder<T>(gc::get_gc(), first, last);
     }
 
     template <class T, class Iter>
     list_ptr<T> new_static_list(Iter first, Iter last)
     {
-        return new_list_placeholder<T>(get_static_gc(), first, last);
+        return new_list_placeholder<T>(gc::get_static_gc(), first, last);
     }
 
     template <class T>
@@ -516,25 +522,28 @@ namespace lutze
     template <class T>
     set_ptr<T> new_set_placeholder(gc& gc)
     {
-        return set_ptr<T>(new(gc) single_container<T>());
+        set_ptr<T> container(new single_container<T>());
+        gc.register_object(static_cast<gc_object*>(container.get()));
+        return container;
     }
 
     template <class T>
     set_ptr<T> new_set()
     {
-        return new_set_placeholder<T>(get_gc());
+        return new_set_placeholder<T>(gc::get_gc());
     }
 
     template <class T>
     set_ptr<T> new_static_set()
     {
-        return new_set_placeholder<T>(get_static_gc());
+        return new_set_placeholder<T>(gc::get_static_gc());
     }
 
     template <class T, class Iter>
     set_ptr<T> new_set_placeholder(gc& gc, Iter first, Iter last)
     {
-        set_ptr<T> container(new(gc) single_container<T>());
+        set_ptr<T> container(new single_container<T>());
+        gc.register_object(static_cast<gc_object*>(container.get()));
         container.insert(first, last);
         return container;
     }
@@ -542,13 +551,13 @@ namespace lutze
     template <class T, class Iter>
     set_ptr<T> new_set(Iter first, Iter last)
     {
-        return new_set_placeholder<T>(get_gc(), first, last);
+        return new_set_placeholder<T>(gc::get_gc(), first, last);
     }
 
     template <class T, class Iter>
     set_ptr<T> new_static_set(Iter first, Iter last)
     {
-        return new_set_placeholder<T>(get_static_gc(), first, last);
+        return new_set_placeholder<T>(gc::get_static_gc(), first, last);
     }
 
     template <class T>
@@ -670,25 +679,28 @@ namespace lutze
     template <class T>
     map_ptr<T> new_map_placeholder(gc& gc)
     {
-        return map_ptr<T>(new(gc) pair_container<T>());
+        map_ptr<T> container(new pair_container<T>());
+        gc.register_object(static_cast<gc_object*>(container.get()));
+        return container;
     }
 
     template <class T>
     map_ptr<T> new_map()
     {
-        return new_map_placeholder<T>(get_gc());
+        return new_map_placeholder<T>(gc::get_gc());
     }
 
     template <class T>
     map_ptr<T> new_static_map()
     {
-        return new_map_placeholder<T>(get_static_gc());
+        return new_map_placeholder<T>(gc::get_static_gc());
     }
 
     template <class T, class Iter>
     map_ptr<T> new_map_placeholder(gc& gc, Iter first, Iter last)
     {
-        map_ptr<T> container(new(gc) pair_container<T>());
+        map_ptr<T> container(new pair_container<T>());
+        gc.register_object(static_cast<gc_object*>(container.get()));
         container.insert(first, last);
         return container;
     }
@@ -696,13 +708,13 @@ namespace lutze
     template <class T, class Iter>
     map_ptr<T> new_map(Iter first, Iter last)
     {
-        return new_map_placeholder<T>(get_gc(), first, last);
+        return new_map_placeholder<T>(gc::get_gc(), first, last);
     }
 
     template <class T, class Iter>
     map_ptr<T> new_static_map(Iter first, Iter last)
     {
-        return new_map_placeholder<T>(get_static_gc(), first, last);
+        return new_map_placeholder<T>(gc::get_static_gc(), first, last);
     }
 }
 

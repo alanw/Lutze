@@ -36,7 +36,7 @@ public:
 
     virtual ~collection_fixture() // teardown
     {
-        get_gc().final_collect();
+        gc::get_gc().final_collect();
     }
 };
 
@@ -46,7 +46,7 @@ namespace test_version
 {
     BOOST_AUTO_TEST_CASE(test_version)
     {
-        BOOST_CHECK_NE(get_gc().gc_version(), "");
+        BOOST_CHECK_NE(gc::get_gc().gc_version(), "");
     }
 }
 
@@ -97,42 +97,7 @@ namespace test_variadic_new_gc
         test_object1_ptr test1 = new_gc<test_object1>("a1");
         test_object2_ptr test2 = new_gc<test_object2>("a1", "a2");
         test_object9_ptr test9 = new_gc<test_object9>("a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8", "a9");
-        get_gc().collect(true);
-    }
-}
-
-namespace test_collect_pointer
-{
-    int32_t instance_count = 0;
-
-    class test_object : public gc_object
-    {
-    public:
-        test_object()
-        {
-            ++instance_count;
-        }
-
-        virtual ~test_object()
-        {
-            --instance_count;
-        }
-    };
-
-    test_object* _test_collect_pointer()
-    {
-        test_object* test = new(get_gc()) test_object;
-        BOOST_CHECK_NE(instance_count, 0);
-        get_gc().collect(true);
-        get_gc().unmark(test); // simulate out of scope
-        return 0;
-    }
-
-    BOOST_AUTO_TEST_CASE(test_collect_pointer)
-    {
-        _test_collect_pointer();
-        get_gc().collect(true);
-        BOOST_CHECK_EQUAL(instance_count, 0);
+        gc::get_gc().collect(true);
     }
 }
 
@@ -160,15 +125,15 @@ namespace test_collect
     {
         test_object_ptr test = new_gc<test_object>();
         BOOST_CHECK_NE(instance_count, 0);
-        get_gc().collect(true);
-        get_gc().unmark(test); // simulate out of scope
+        gc::get_gc().collect(true);
+        gc::get_gc().unmark(test); // simulate out of scope
         return test_object_ptr();
     }
 
     BOOST_AUTO_TEST_CASE(test_collect)
     {
         _test_collect();
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
         BOOST_CHECK_EQUAL(instance_count, 0);
     }
 }
@@ -207,79 +172,16 @@ namespace null_member_collect
     {
         null_member_object_ptr test = new_gc<null_member_object>();
         BOOST_CHECK_NE(instance_count, 0);
-        get_gc().collect(true);
-        get_gc().unmark(test); // simulate out of scope
+        gc::get_gc().collect(true);
+        gc::get_gc().unmark(test); // simulate out of scope
         return null_member_object_ptr();
     }
 
     BOOST_AUTO_TEST_CASE(test_null_member_collect)
     {
         _test_null_member_collect();
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
         BOOST_CHECK_EQUAL(instance_count, 0);
-    }
-}
-
-namespace member_collect_pointer
-{
-    int32_t instance_count = 0;
-    int32_t child_count = 0;
-
-    class test_object : public gc_object
-    {
-    public:
-        test_object()
-        {
-            ++child_count;
-        }
-
-        virtual ~test_object()
-        {
-            --child_count;
-        }
-    };
-
-    class member_test_object : public gc_object
-    {
-    public:
-        member_test_object()
-        {
-            ++instance_count;
-            child1 = new(get_gc()) test_object;
-            child2 = new(get_gc()) test_object;
-        }
-
-        virtual ~member_test_object()
-        {
-            --instance_count;
-        }
-
-        test_object* child1;
-        test_object* child2;
-
-        virtual void mark_members(gc* gc) const
-        {
-            gc->mark(child1);
-            gc->mark(child2);
-        }
-    };
-
-    member_test_object* _test_member_collect_pointer()
-    {
-        member_test_object* test = new(get_gc()) member_test_object;
-        BOOST_CHECK_NE(instance_count, 0);
-        BOOST_CHECK_NE(child_count, 0);
-        get_gc().collect(true);
-        get_gc().unmark(test); // simulate out of scope
-        return 0;
-    }
-
-    BOOST_AUTO_TEST_CASE(test_member_collect_pointer)
-    {
-        _test_member_collect_pointer();
-        get_gc().collect(true);
-        BOOST_CHECK_EQUAL(instance_count, 0);
-        BOOST_CHECK_EQUAL(child_count, 0);
     }
 }
 
@@ -336,17 +238,17 @@ namespace member_collect
         member_test_object_ptr test = new_gc<member_test_object>();
         BOOST_CHECK_NE(instance_count, 0);
         BOOST_CHECK_NE(child_count, 0);
-        get_gc().collect(true);
-        get_gc().unmark(test->child1);
-        get_gc().unmark(test->child2);
-        get_gc().unmark(test); // simulate out of scope
+        gc::get_gc().collect(true);
+        gc::get_gc().unmark(test->child1);
+        gc::get_gc().unmark(test->child2);
+        gc::get_gc().unmark(test); // simulate out of scope
         return member_test_object_ptr();
     }
 
     BOOST_AUTO_TEST_CASE(test_member_collect)
     {
         _test_member_collect();
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
         BOOST_CHECK_EQUAL(instance_count, 0);
         BOOST_CHECK_EQUAL(child_count, 0);
     }
@@ -421,16 +323,16 @@ namespace non_gc_collect
         BOOST_CHECK_NE(instance_count, 0);
         BOOST_CHECK_NE(managed_count, 0);
         BOOST_CHECK_NE(unmanaged_count, 0);
-        get_gc().collect(true);
-        get_gc().unmark(test->child1);
-        get_gc().unmark(test); // simulate out of scope
+        gc::get_gc().collect(true);
+        gc::get_gc().unmark(test->child1);
+        gc::get_gc().unmark(test); // simulate out of scope
         return member_test_object_ptr();
     }
 
     BOOST_AUTO_TEST_CASE(test_non_gc_collect)
     {
         _member_test_object();
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
         BOOST_CHECK_EQUAL(instance_count, 0);
         BOOST_CHECK_EQUAL(managed_count, 0);
         BOOST_CHECK_EQUAL(unmanaged_count, 0);
@@ -477,16 +379,16 @@ namespace cyclic_reference
         test1->set_other(test2);
         test2->set_other(test1);
         BOOST_CHECK_NE(instance_count, 0);
-        get_gc().collect(true);
-        get_gc().unmark(test1); // simulate out of scope
-        get_gc().unmark(test2); // simulate out of scope
+        gc::get_gc().collect(true);
+        gc::get_gc().unmark(test1); // simulate out of scope
+        gc::get_gc().unmark(test2); // simulate out of scope
         return cycle_object_ptr();
     }
 
     BOOST_AUTO_TEST_CASE(test_cyclic_references)
     {
         _test_cyclic_references();
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
         BOOST_CHECK_EQUAL(instance_count, 0);
     }
 }
@@ -523,15 +425,15 @@ namespace recursive_stack
         fib_object_ptr test = new_gc<fib_object>();
         BOOST_CHECK_EQUAL(test->fibonacci(20), 6765);
         BOOST_CHECK_NE(instance_count, 0);
-        get_gc().collect(true);
-        get_gc().unmark(test); // simulate out of scope
+        gc::get_gc().collect(true);
+        gc::get_gc().unmark(test); // simulate out of scope
         return fib_object_ptr();
     }
 
     BOOST_AUTO_TEST_CASE(test_recursive)
     {
         _test_recursive();
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
         BOOST_CHECK_EQUAL(instance_count, 0);
     }
 }
@@ -579,15 +481,15 @@ namespace deep_call_graph_reference
     {
         deep_object_ptr test = new_gc<deep_object>();
         BOOST_CHECK_NE(instance_count, 0);
-        get_gc().collect(true);
-        get_gc().unmark(test); // simulate out of scope
+        gc::get_gc().collect(true);
+        gc::get_gc().unmark(test); // simulate out of scope
         return deep_object_ptr();
     }
 
     BOOST_AUTO_TEST_CASE(test_deep_call)
     {
         _test_deep_call();
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
         BOOST_CHECK_EQUAL(instance_count, 0);
     }
 }
@@ -616,17 +518,17 @@ namespace test_static
     {
         test_object_ptr test = new_static_gc<test_object>();
         BOOST_CHECK_NE(instance_count, 0);
-        get_static_gc().collect(true);
-        get_gc().unmark(test); // simulate out of scope
+        gc::get_static_gc().collect(true);
+        gc::get_gc().unmark(test); // simulate out of scope
         return test_object_ptr();
     }
 
     BOOST_AUTO_TEST_CASE(test_static)
     {
         _test_static();
-        get_static_gc().collect(true);
+        gc::get_static_gc().collect(true);
         BOOST_CHECK_NE(instance_count, 0);
-        get_static_gc().final_collect();
+        gc::get_static_gc().final_collect();
         BOOST_CHECK_EQUAL(instance_count, 0);
     }
 }
@@ -687,20 +589,20 @@ namespace test_static_transfer
         member_test_object_ptr test = new_gc<member_test_object>();
         BOOST_CHECK_NE(instance_count, 0);
         BOOST_CHECK_NE(child_count, 0);
-        get_static_gc().collect(true);
-        get_gc().collect(true);
-        get_gc().unmark(test); // simulate out of scope
+        gc::get_static_gc().collect(true);
+        gc::get_gc().collect(true);
+        gc::get_gc().unmark(test); // simulate out of scope
         return member_test_object_ptr();
     }
 
     BOOST_AUTO_TEST_CASE(test_static_transfer)
     {
         _test_static_transfer();
-        get_static_gc().collect(true);
-        get_gc().collect(true);
+        gc::get_static_gc().collect(true);
+        gc::get_gc().collect(true);
         BOOST_CHECK_EQUAL(instance_count, 0);
         BOOST_CHECK_NE(child_count, 0);
-        get_static_gc().final_collect();
+        gc::get_static_gc().final_collect();
         BOOST_CHECK_EQUAL(child_count, 0);
     }
 }
@@ -732,17 +634,17 @@ namespace test_set
         for (int32_t i = 0; i < 100; ++i)
             test.insert(new_gc<elem_object>());
         BOOST_CHECK_EQUAL(instance_count, 100);
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
         for (elem_set::const_iterator elem = test.begin(), last = test.end(); elem != last; ++elem)
-            get_gc().unmark(*elem);
-        get_gc().unmark(test); // simulate out of scope
+            gc::get_gc().unmark(*elem);
+        gc::get_gc().unmark(test); // simulate out of scope
         return elem_set();
     }
 
     BOOST_AUTO_TEST_CASE(test_set)
     {
         _test_set();
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
         BOOST_CHECK_EQUAL(instance_count, 0);
     }
 }
@@ -774,17 +676,17 @@ namespace test_map_key
         for (int32_t i = 0; i < 100; ++i)
             test.insert(std::make_pair(new_gc<elem_object>(), i));
         BOOST_CHECK_EQUAL(instance_count, 100);
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
         for (elem_map::const_iterator elem = test.begin(), last = test.end(); elem != last; ++elem)
-            get_gc().unmark(elem->first);
-        get_gc().unmark(test); // simulate out of scope
+            gc::get_gc().unmark(elem->first);
+        gc::get_gc().unmark(test); // simulate out of scope
         return elem_map();
     }
 
     BOOST_AUTO_TEST_CASE(test_map_key)
     {
         _test_map_key();
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
         BOOST_CHECK_EQUAL(instance_count, 0);
     }
 }
@@ -816,17 +718,17 @@ namespace test_map_value
         for (int32_t i = 0; i < 10; ++i)
             test.insert(std::make_pair(i, new_gc<elem_object>()));
         BOOST_CHECK_EQUAL(instance_count, 10);
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
         for (elem_map::const_iterator elem = test.begin(), last = test.end(); elem != last; ++elem)
-            get_gc().unmark(elem->second);
-        get_gc().unmark(test); // simulate out of scope
+            gc::get_gc().unmark(elem->second);
+        gc::get_gc().unmark(test); // simulate out of scope
         return elem_map();
     }
 
     BOOST_AUTO_TEST_CASE(test_map_value)
     {
         _test_map_value();
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
         BOOST_CHECK_EQUAL(instance_count, 0);
     }
 }
@@ -858,20 +760,20 @@ namespace test_map_key_value
         for (int32_t i = 0; i < 10; ++i)
             test.insert(std::make_pair(new_gc<elem_object>(), new_gc<elem_object>()));
         BOOST_CHECK_EQUAL(instance_count, 20);
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
         for (elem_map::const_iterator elem = test.begin(), last = test.end(); elem != last; ++elem)
         {
-            get_gc().unmark(elem->first);
-            get_gc().unmark(elem->second);
+            gc::get_gc().unmark(elem->first);
+            gc::get_gc().unmark(elem->second);
         }
-        get_gc().unmark(test); // simulate out of scope
+        gc::get_gc().unmark(test); // simulate out of scope
         return elem_map();
     }
 
     BOOST_AUTO_TEST_CASE(test_map_key_value)
     {
         _test_map_key_value();
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
         BOOST_CHECK_EQUAL(instance_count, 0);
     }
 }
@@ -900,8 +802,8 @@ namespace test_vector_non_gc
     {
         elem_vector test = new_vector<elem_vector::vector_type>(store.begin(), store.end());
         BOOST_CHECK_EQUAL(instance_count, 10);
-        get_gc().collect(true);
-        get_gc().unmark(test); // simulate out of scope
+        gc::get_gc().collect(true);
+        gc::get_gc().unmark(test); // simulate out of scope
         return elem_vector();
     }
 
@@ -913,7 +815,7 @@ namespace test_vector_non_gc
         _test_vector_non_gc(store);
         for (int32_t i = 0; i < 10; ++i)
             delete store[i];
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
         BOOST_CHECK_EQUAL(instance_count, 0);
     }
 }
@@ -954,19 +856,19 @@ namespace test_map_key_set
         BOOST_CHECK_EQUAL(instance_count, 110);
         for (elem_map::const_iterator elem = test.begin(), last = test.end(); elem != last; ++elem)
         {
-            get_gc().unmark(elem->first);
+            gc::get_gc().unmark(elem->first);
             for (elem_set::const_iterator testelem = elem->second->begin(), last = elem->second->end(); testelem != last; ++testelem)
-                get_gc().unmark(*testelem);
-            get_gc().unmark(elem->second);
+                gc::get_gc().unmark(*testelem);
+            gc::get_gc().unmark(elem->second);
         }
-        get_gc().unmark(test); // simulate out of scope
+        gc::get_gc().unmark(test); // simulate out of scope
         return elem_map();
     }
 
     BOOST_AUTO_TEST_CASE(test_map_key_set)
     {
         _test_map_key_set();
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
         BOOST_CHECK_EQUAL(instance_count, 0);
     }
 }
@@ -998,17 +900,17 @@ namespace test_large_vector
         for (int32_t i = 0; i < 10000; ++i)
             test.push_back(new_gc<elem_object>());
         BOOST_CHECK_EQUAL(instance_count, 10000);
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
         for (elem_vector::const_iterator elem = test.begin(), last = test.end(); elem != last; ++elem)
-            get_gc().unmark(*elem);
-        get_gc().unmark(test); // simulate out of scope
+            gc::get_gc().unmark(*elem);
+        gc::get_gc().unmark(test); // simulate out of scope
         return elem_vector();
     }
 
     BOOST_AUTO_TEST_CASE(test_large_vector)
     {
         _test_large_vector();
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
         BOOST_CHECK_EQUAL(instance_count, 0);
     }
 }
@@ -1041,15 +943,15 @@ namespace test_thread_stop_single
         elem_object_ptr test = new_gc<elem_object>();
         BOOST_CHECK_EQUAL(instance_count, 1);
         boost::this_thread::sleep(boost::posix_time::milliseconds(100));
-        get_gc().collect(true);
-        get_gc().unmark(test); // simulate out of scope
+        gc::get_gc().collect(true);
+        gc::get_gc().unmark(test); // simulate out of scope
     }
 
     BOOST_AUTO_TEST_CASE(test_thread_stop_single)
     {
         boost::thread worker_thread(worker_func);
         worker_thread.join();
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
         BOOST_CHECK_EQUAL(instance_count, 0);
     }
 }
@@ -1082,16 +984,16 @@ namespace test_thread_stop_two
         elem_object_ptr test = new_gc<elem_object>();
         BOOST_CHECK_EQUAL(instance_count, 1);
         boost::this_thread::sleep(boost::posix_time::milliseconds(100));
-        get_gc().collect(true);
-        get_gc().unmark(test); // simulate out of scope
+        gc::get_gc().collect(true);
+        gc::get_gc().unmark(test); // simulate out of scope
     }
 
     BOOST_AUTO_TEST_CASE(test_thread_stop_two)
     {
-        get_gc(); // this will register a gc against the main thread
+        gc::get_gc(); // this will register a gc against the main thread
         boost::thread worker_thread(worker_func);
         worker_thread.join();
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
         BOOST_CHECK_EQUAL(instance_count, 0);
     }
 }
@@ -1144,8 +1046,8 @@ namespace test_thread_multiple
     {
         deep_object_ptr test = new_gc<deep_object>();
         BOOST_CHECK_NE(instance_count, 0);
-        get_gc().collect(true);
-        get_gc().unmark(test); // simulate out of scope
+        gc::get_gc().collect(true);
+        gc::get_gc().unmark(test); // simulate out of scope
     }
 
     BOOST_AUTO_TEST_CASE(test_thread_multiple)
@@ -1160,7 +1062,7 @@ namespace test_thread_multiple
             delete threads[i];
             threads[i] = NULL;
         }
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
         BOOST_CHECK_EQUAL(instance_count, 0);
     }
 }
@@ -1194,20 +1096,20 @@ namespace test_thread_multiple_collection
         elem_map test = new_map<elem_map::map_type>();
         for (int32_t i = 0; i < 10; ++i)
             test.insert(std::make_pair(new_gc<elem_object>(), new_gc<elem_object>()));
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
         for (elem_map::const_iterator elem = test.begin(), last = test.end(); elem != last; ++elem)
         {
-            get_gc().unmark(elem->first);
-            get_gc().unmark(elem->second);
+            gc::get_gc().unmark(elem->first);
+            gc::get_gc().unmark(elem->second);
         }
-        get_gc().unmark(test); // simulate out of scope
+        gc::get_gc().unmark(test); // simulate out of scope
         return test;
     }
 
     void worker_func()
     {
         _test_thread_multiple_collection();
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
     }
 
     BOOST_AUTO_TEST_CASE(test_thread_multiple_collection)
@@ -1221,7 +1123,7 @@ namespace test_thread_multiple_collection
             threads[i]->join();
             delete threads[i];
         }
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
         BOOST_CHECK_EQUAL(instance_count, 0);
     }
 }
@@ -1304,17 +1206,17 @@ namespace test_thread_object_transfer
         boost::this_thread::sleep(boost::posix_time::milliseconds(100));
         test_thread.join();
 
-        get_gc().collect(true);
-        get_gc().unmark(test->child1);
-        get_gc().unmark(test->child2);
-        get_gc().unmark(test); // simulate out of scope
+        gc::get_gc().collect(true);
+        gc::get_gc().unmark(test->child1);
+        gc::get_gc().unmark(test->child2);
+        gc::get_gc().unmark(test); // simulate out of scope
         return member_test_object_ptr();
     }
 
     BOOST_AUTO_TEST_CASE(test_thread_object_transfer)
     {
         _test_thread_object_transfer();
-        get_gc().collect(true);
+        gc::get_gc().collect(true);
         BOOST_CHECK_EQUAL(instance_count, 0);
         BOOST_CHECK_EQUAL(child_count, 0);
     }

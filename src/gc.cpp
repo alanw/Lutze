@@ -129,6 +129,25 @@ namespace lutze
         delete pgc;
     }
 
+    gc& gc::get_gc()
+    {
+        static boost::thread_specific_ptr<gc> thread_gc(gc::unregister_gc);
+        if (thread_gc.get() == NULL)
+        {
+            thread_gc.reset(new gc);
+            gc::register_gc(thread_gc.get());
+        }
+        return *thread_gc.get();
+    }
+
+    gc& gc::get_static_gc()
+    {
+        static gc* static_gc = NULL;
+        if (static_gc == NULL)
+            static_gc = new gc(true);
+        return *static_gc;
+    }
+
     void gc::collect(bool force)
     {
         // have we reached threshold before collection is necessary?
@@ -352,9 +371,9 @@ namespace lutze
             std::set_difference(gc_running.begin(), gc_running.end(), node->second.history.begin(), node->second.history.end(), std::inserter(remaining, remaining.end()));
             if (alloc_only || remaining.empty())
             {
-                // manually destroy object before unregistering from this gc
-                node->second.object->~gc_object();
-                gc_object::operator delete(const_cast<gc_object*>(node->second.object), *this);
+                // destroy object after unregistering from this gc
+                unregister_object(node->second.object);
+                delete const_cast<gc_object*>(node->second.object);
             }
             else
             {

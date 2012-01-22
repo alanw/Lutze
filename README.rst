@@ -29,7 +29,6 @@ Features
 * Cross-platform code - tested on Windows, Mac and Linux.
 * Thread safe and multi-thread compatible.
 * Supports garbage collected objects and collections.
-* Can be used with raw pointers or managed pointers that assist collections.
 * Does not stop the (entire) world when performing collections.
 * Destructors called when objects are destroyed.
 * Works well with unmanaged objects.
@@ -47,62 +46,13 @@ Because there has to be some rules, right?
 * Care must be taken to ensure destructors do not contain non-trivial code,
   since objects may be destroyed at any time and not necessarily from the
   same thread that they were created.
-* Using garbage collected objects doesn't mean you can abandon thinking!
+* Using garbage collected objects doesn't mean you can abandon all thinking!
 
 
 Usage
 -----
 
 All garbage collected objects must be derived from lutze::gc_object::
-
-    #include "gc.h"
-
-    using namespace lutze;
-
-    class example_object : public gc_object
-    {
-    public:
-        example_object(const std::string& test) : member1(test), member2(0)
-        {
-            // don't forget to initialize member2!
-        }
-
-        virtual ~example_object()
-        {
-            // destructor called when object is destroyed
-        }
-
-        virtual void mark_members(gc* gc) const
-        {
-            gc->mark(member2);
-        }
-
-    protected:
-        std::string member1; // unmanaged member is ok
-        example_object* member2; // managed member
-    };
-
-    gc::gc_init();
-
-    ...
-
-    // NOTE: get_gc() will return the garbage collector instance for this thread
-    example_object* ex = new(get_gc()) example_object;
-
-    ...
-
-    get_gc().collect(); // perform garbage collection here
-
-    // NOTE: it is your responsibility to call collect() if using raw pointers.
-
-Alternatively, you can use the (preferred) method of managed pointers. These
-are smart pointers that share similar characteristics to boost::shared_ptr, but
-don't perform any reference counting or locking and are therefore completely
-thread-safe. Their job is to simplify pointer initialization and automatically
-collecting unreferenced objects without you having to think about things too
-much.
-
-The smart pointer syntax is similar to using raw pointers::
 
     #include "gc.h"
 
@@ -139,27 +89,30 @@ The smart pointer syntax is similar to using raw pointers::
     ...
 
     // NOTE: new_gc<>() will instantiate an object using the garbage collector
-    // for this thread. It's usage is similar to boost::make_shared<>()
+    // assigned to this thread. It's usage is similar to boost::make_shared<>()
     example_object_ptr test = new_gc<example_object>();
 
     ...
 
-    // NOTE: explicitly calling get_gc().collect() is not required since
+    // NOTE: explicitly calling gc::get_gc().collect() is not required since
     // collection is performed if necessary during calls to new_gc<>(). However
     // there is nothing stopping you from collecting periodically if necessary.
+    gc::get_gc().collect();
 
-Statically allocated gc objects are performed slightly differently since their
-lifetimes are managed differently::
+All pointers to garbage collected objects are managed through smart pointers
+that share similar characteristics to boost::shared_ptr, but don't perform any
+reference counting or locking and are therefore completely thread-safe. Their
+job is to simplify pointer initialization and automatically collecting
+unreferenced objects without you having to think about things too much.
+
+Statically allocated gc objects are instantiated slightly differently since
+their lifetimes are managed separately::
 
     #include "gc.h"
 
     using namespace lutze;
 
     example_object_ptr example_ptr = new_static_gc<example_object>();
-
-    // or
-
-    example_object* example = new(get_static_gc()) example_object;
 
 
 Collections
@@ -168,6 +121,7 @@ Collections
 Lutze also supports collections of managed objects, including:
 
 * vectors
+* deques
 * sets
 * maps
 * lists
@@ -245,7 +199,7 @@ Another inherent problem is that transfered objects could queue up against gc's
 that don't perform any new_gc<> calls. Unfortunately, there doesn't seem to be
 any clean solution to this problem, and it is left to the developer to make
 sure that any long running threads should occasionally call new_gc<> or manually
-trigger collections by calling get_gc().collect() periodically.
+trigger collections by calling gc::get_gc().collect() periodically.
 
 As previously described, statically created managed objects should be created
 using new_static_gc<> because they use a separate gc instance. Objects created

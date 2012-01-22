@@ -19,7 +19,6 @@ include_directories(
 
 set (gc_SOURCES
     src/gc.cpp
-    src/gc_object.cpp
     test/gc_main.cpp
     test/gc_test.cpp
 )
