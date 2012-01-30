@@ -138,6 +138,37 @@ namespace test_collect
     }
 }
 
+namespace test_collect_mark
+{
+    int32_t mark_count = 0;
+
+    class test_object : public gc_object
+    {
+    public:
+        virtual void mark_members(gc* gc) const
+        {
+            ++mark_count;
+        }
+    };
+
+    typedef gc_ptr<test_object> test_object_ptr;
+
+    test_object_ptr _test_collect_mark()
+    {
+        test_object_ptr test = new_gc<test_object>();
+        BOOST_CHECK_EQUAL(mark_count, 0);
+        gc::get_gc().collect(true);
+        BOOST_CHECK_EQUAL(mark_count, 1);
+        return test_object_ptr();
+    }
+
+    BOOST_AUTO_TEST_CASE(test_collect_mark)
+    {
+        _test_collect_mark();
+        gc::get_gc().collect(true);
+    }
+}
+
 namespace null_member_collect
 {
     int32_t instance_count = 0;
@@ -649,6 +680,40 @@ namespace test_set
     }
 }
 
+namespace test_set_mark
+{
+    int32_t mark_count = 0;
+
+    class elem_object : public gc_object
+    {
+    public:
+        virtual void mark_members(gc* gc) const
+        {
+            ++mark_count;
+        }
+    };
+
+    typedef gc_ptr<elem_object> elem_object_ptr;
+    typedef set_ptr< std::set<elem_object_ptr> > elem_set;
+
+    elem_set _test_set_mark()
+    {
+        elem_set test = new_set<elem_set::set_type>();
+        for (int32_t i = 0; i < 100; ++i)
+            test.insert(new_gc<elem_object>());
+        BOOST_CHECK_EQUAL(mark_count, 0);
+        gc::get_gc().collect(true);
+        BOOST_CHECK_EQUAL(mark_count, 100);
+        return elem_set();
+    }
+
+    BOOST_AUTO_TEST_CASE(test_set_mark)
+    {
+        _test_set_mark();
+        gc::get_gc().collect(true);
+    }
+}
+
 namespace test_map_key
 {
     int32_t instance_count = 0;
@@ -688,6 +753,40 @@ namespace test_map_key
         _test_map_key();
         gc::get_gc().collect(true);
         BOOST_CHECK_EQUAL(instance_count, 0);
+    }
+}
+
+namespace test_map_key_mark
+{
+    int32_t mark_count = 0;
+
+    class elem_object : public gc_object
+    {
+    public:
+        virtual void mark_members(gc* gc) const
+        {
+            ++mark_count;
+        }
+    };
+
+    typedef gc_ptr<elem_object> elem_object_ptr;
+    typedef map_ptr< std::map<elem_object_ptr, int32_t> > elem_map;
+
+    elem_map _test_map_key_mark()
+    {
+        elem_map test = new_map<elem_map::map_type>();
+        for (int32_t i = 0; i < 100; ++i)
+            test.insert(std::make_pair(new_gc<elem_object>(), i));
+        BOOST_CHECK_EQUAL(mark_count, 0);
+        gc::get_gc().collect(true);
+        BOOST_CHECK_EQUAL(mark_count, 100);
+        return elem_map();
+    }
+
+    BOOST_AUTO_TEST_CASE(test_map_key_mark)
+    {
+        _test_map_key_mark();
+        gc::get_gc().collect(true);
     }
 }
 
@@ -733,6 +832,40 @@ namespace test_map_value
     }
 }
 
+namespace test_map_value_mark
+{
+    int32_t mark_count = 0;
+
+    class elem_object : public gc_object
+    {
+    public:
+        virtual void mark_members(gc* gc) const
+        {
+            ++mark_count;
+        }
+    };
+
+    typedef gc_ptr<elem_object> elem_object_ptr;
+    typedef map_ptr< std::map<int32_t, elem_object_ptr> > elem_map;
+
+    elem_map _test_map_value_mark()
+    {
+        elem_map test = new_map<elem_map::map_type>();
+        for (int32_t i = 0; i < 10; ++i)
+            test.insert(std::make_pair(i, new_gc<elem_object>()));
+        BOOST_CHECK_EQUAL(mark_count, 0);
+        gc::get_gc().collect(true);
+        BOOST_CHECK_EQUAL(mark_count, 10);
+        return elem_map();
+    }
+
+    BOOST_AUTO_TEST_CASE(test_map_value_mark)
+    {
+        _test_map_value_mark();
+        gc::get_gc().collect(true);
+    }
+}
+
 namespace test_map_key_value
 {
     int32_t instance_count = 0;
@@ -775,6 +908,40 @@ namespace test_map_key_value
         _test_map_key_value();
         gc::get_gc().collect(true);
         BOOST_CHECK_EQUAL(instance_count, 0);
+    }
+}
+
+namespace _test_map_key_value_mark
+{
+    int32_t mark_count = 0;
+
+    class elem_object : public gc_object
+    {
+    public:
+        virtual void mark_members(gc* gc) const
+        {
+            ++mark_count;
+        }
+    };
+
+    typedef gc_ptr<elem_object> elem_object_ptr;
+    typedef map_ptr< std::map<elem_object_ptr, elem_object_ptr> > elem_map;
+
+    elem_map _test_map_key_value_mark()
+    {
+        elem_map test = new_map<elem_map::map_type>();
+        for (int32_t i = 0; i < 10; ++i)
+            test.insert(std::make_pair(new_gc<elem_object>(), new_gc<elem_object>()));
+        BOOST_CHECK_EQUAL(mark_count, 0);
+        gc::get_gc().collect(true);
+        BOOST_CHECK_EQUAL(mark_count, 20);
+        return elem_map();
+    }
+
+    BOOST_AUTO_TEST_CASE(test_map_key_value_mark)
+    {
+        _test_map_key_value_mark();
+        gc::get_gc().collect(true);
     }
 }
 
@@ -851,7 +1018,6 @@ namespace test_map_key_set
             for (int32_t j = 0; j < 10; ++j)
                 testset.insert(new_gc<elem_object>());
             test.insert(std::make_pair(new_gc<elem_object>(), testset));
-
         }
         BOOST_CHECK_EQUAL(instance_count, 110);
         for (elem_map::const_iterator elem = test.begin(), last = test.end(); elem != last; ++elem)
@@ -870,6 +1036,46 @@ namespace test_map_key_set
         _test_map_key_set();
         gc::get_gc().collect(true);
         BOOST_CHECK_EQUAL(instance_count, 0);
+    }
+}
+
+namespace test_map_key_set_mark
+{
+    int32_t mark_count = 0;
+
+    class elem_object : public gc_object
+    {
+    public:
+        virtual void mark_members(gc* gc) const
+        {
+            ++mark_count;
+        }
+    };
+
+    typedef gc_ptr<elem_object> elem_object_ptr;
+    typedef set_ptr< std::set<elem_object_ptr> > elem_set;
+    typedef map_ptr< std::map<elem_object_ptr, elem_set> > elem_map;
+
+    elem_map _test_map_key_set_mark()
+    {
+        elem_map test = new_map<elem_map::map_type>();
+        for (int32_t i = 0; i < 10; ++i)
+        {
+            elem_set testset = new_set<elem_set::set_type>();
+            for (int32_t j = 0; j < 10; ++j)
+                testset.insert(new_gc<elem_object>());
+            test.insert(std::make_pair(new_gc<elem_object>(), testset));
+        }
+        BOOST_CHECK_EQUAL(mark_count, 0);
+        gc::get_gc().collect(true);
+        BOOST_CHECK_EQUAL(mark_count, 110);
+        return elem_map();
+    }
+
+    BOOST_AUTO_TEST_CASE(test_map_key_set_mark)
+    {
+        _test_map_key_set_mark();
+        gc::get_gc().collect(true);
     }
 }
 

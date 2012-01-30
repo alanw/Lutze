@@ -114,9 +114,9 @@ namespace lutze
 
     void gc::register_gc(gc* pgc)
     {
+        boost::mutex::scoped_lock lock(gc_registry_mutex);
         if (!gc_init())
             boost::throw_exception(std::runtime_error("gc_init() must be called"));
-        boost::mutex::scoped_lock lock(gc_registry_mutex);
         gc_registry.insert(pgc);
     }
 

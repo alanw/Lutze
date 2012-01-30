@@ -10,6 +10,8 @@
 #include <set>
 #include <string>
 #include <boost/cstdint.hpp>
+#include <boost/type_traits.hpp>
+#include <boost/utility/enable_if.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/tss.hpp>
@@ -37,6 +39,16 @@ namespace lutze
         }
 
         friend class gc;
+    };
+
+    // all garbage collected container classes must be derived from this class
+    class gc_container
+    {
+    public:
+        virtual gc_object* get() const
+        {
+            return NULL;
+        }
     };
 
     class gc
@@ -109,30 +121,42 @@ namespace lutze
 
         // a default mark function called for pod types
         template <class OBJ>
-        void mark(OBJ obj)
+        void mark(OBJ obj, typename boost::disable_if< boost::is_convertible<OBJ, gc_container> >::type* dummy = 0)
         {
             // do nothing
+        }
+
+        // mark container as reachable
+        void mark(const gc_container& obj)
+        {
+            mark_object(obj.get());
         }
 
         // mark object pointer as reachable
         template <class OBJ>
         void mark(const gc_ptr<OBJ>& obj)
         {
-            mark_object(reinterpret_cast<gc_object*>(obj.get()));
+            mark_object(static_cast<gc_object*>(obj.get()));
         }
 
         // a default unmark function called for pod types
         template <class OBJ>
-        void unmark(OBJ obj)
+        void unmark(OBJ obj, typename boost::disable_if< boost::is_convertible<OBJ, gc_container> >::type* dummy = 0)
         {
             // do nothing
+        }
+
+        // mark container as unreachable
+        void unmark(const gc_container& obj)
+        {
+            mark_object(obj.get());
         }
 
         // mark object pointer as unreachable (used to force out of scope)
         template <class OBJ>
         void unmark(const gc_ptr<OBJ>& obj)
         {
-            unmark_object(reinterpret_cast<gc_object*>(obj.get()));
+            unmark_object(static_cast<gc_object*>(obj.get()));
         }
 
         // perform garbage collection (can force collection which ignores thresholds)

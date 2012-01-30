@@ -4,9 +4,6 @@
 // or the GNU Lesser General Public License.
 /////////////////////////////////////////////////////////////////////////////
 
-#include <boost/type_traits.hpp>
-#include <boost/utility/enable_if.hpp>
-
 #ifndef _LUTZE_GC_CONTAINER
 #define _LUTZE_GC_CONTAINER
 
@@ -15,7 +12,7 @@
 namespace lutze
 {
     template <class T>
-    class container_ptr : public gc_ptr<T>
+    class container_ptr : public gc_container, public gc_ptr<T>
     {
     public:
         typedef T container_type;
@@ -29,6 +26,11 @@ namespace lutze
 
         container_ptr(const container_ptr& rhs) : gc_ptr<T>(rhs.px)
         {
+        }
+
+        virtual gc_object* get() const
+        {
+            return gc_ptr<T>::get();
         }
 
         iterator begin()
