@@ -549,7 +549,6 @@ namespace test_static
     {
         test_object_ptr test = new_static_gc<test_object>();
         BOOST_CHECK_NE(instance_count, 0);
-        gc::get_static_gc().collect(true);
         gc::get_gc().unmark(test); // simulate out of scope
         return test_object_ptr();
     }
@@ -557,7 +556,6 @@ namespace test_static
     BOOST_AUTO_TEST_CASE(test_static)
     {
         _test_static();
-        gc::get_static_gc().collect(true);
         BOOST_CHECK_NE(instance_count, 0);
         gc::get_static_gc().final_collect();
         BOOST_CHECK_EQUAL(instance_count, 0);
@@ -620,7 +618,6 @@ namespace test_static_transfer
         member_test_object_ptr test = new_gc<member_test_object>();
         BOOST_CHECK_NE(instance_count, 0);
         BOOST_CHECK_NE(child_count, 0);
-        gc::get_static_gc().collect(true);
         gc::get_gc().collect(true);
         gc::get_gc().unmark(test); // simulate out of scope
         return member_test_object_ptr();
@@ -629,12 +626,69 @@ namespace test_static_transfer
     BOOST_AUTO_TEST_CASE(test_static_transfer)
     {
         _test_static_transfer();
-        gc::get_static_gc().collect(true);
         gc::get_gc().collect(true);
         BOOST_CHECK_EQUAL(instance_count, 0);
         BOOST_CHECK_NE(child_count, 0);
         gc::get_static_gc().final_collect();
         BOOST_CHECK_EQUAL(child_count, 0);
+    }
+}
+
+namespace test_static_promotion
+{
+    int32_t instance_count = 0;
+
+    class test_object : public gc_object
+    {
+    public:
+        test_object()
+        {
+            ++instance_count;
+        }
+
+        virtual ~test_object()
+        {
+            --instance_count;
+        }
+    };
+
+    typedef gc_ptr<test_object> test_object_ptr;
+
+    class test_static : public gc_object
+    {
+    public:
+        test_static()
+        {
+            member_object = new_gc<test_object>();
+        }
+
+        test_object_ptr member_object;
+
+        virtual void mark_members(gc* gc) const
+        {
+            gc->mark(member_object);
+        }
+    };
+
+    typedef gc_ptr<test_static> test_static_ptr;
+
+    test_object_ptr _test_static_promotion()
+    {
+        test_static_ptr test = new_static_gc<test_static>();
+        BOOST_CHECK_NE(instance_count, 0);
+        gc::get_gc().unmark(test->member_object); // simulate out of scope
+        gc::get_gc().collect(true);
+        return test_object_ptr();
+    }
+
+    BOOST_AUTO_TEST_CASE(test_static_promotion)
+    {
+        _test_static_promotion();
+        BOOST_CHECK_NE(instance_count, 0); // should still be in scope
+        gc::get_gc().final_collect();
+        BOOST_CHECK_NE(instance_count, 0); // should be promoted to static object
+        gc::get_static_gc().final_collect();
+        BOOST_CHECK_EQUAL(instance_count, 0); // only destroyed when static gc collected
     }
 }
 

@@ -13,6 +13,7 @@ namespace lutze
     using boost::uint32_t;
     using boost::int64_t;
     using boost::uint64_t;
+    using boost::int8_t;
     using boost::uint8_t;
 
     namespace detail

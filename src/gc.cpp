@@ -85,7 +85,7 @@ namespace lutze
     static const uint32_t register_threshold = 200;
     static const uint32_t transfer_threshold = 100;
 
-    gc::gc(bool alloc_only) : alloc_only(alloc_only), mark_token(0), register_count(0)
+    gc::gc(bool static_gc) : static_gc(static_gc), mark_token(0), register_count(0)
     {
     }
 
@@ -144,28 +144,55 @@ namespace lutze
     {
         static gc* static_gc = NULL;
         if (static_gc == NULL)
+        {
             static_gc = new gc(true);
+            gc::register_gc(static_gc);
+        }
         return *static_gc;
     }
 
     void gc::collect(bool force)
     {
+        BOOST_ASSERT(!static_gc);
+
         // have we reached threshold before collection is necessary?
-        if (alloc_only || (!force && !check_threshold()))
+        if (!force && !check_threshold())
             return;
 
         // 1) prepare release queue
         init_collect();
 
-        // 2) scan stack for roots
+        // 2) compile set of root objects to begin marking
         node_map roots;
-        scan_stack(roots);
+        find_roots(roots);
 
         // 3) mark phase
         mark_objects(roots);
 
         // 4) sweep phase
         sweep_objects();
+
+        // 5) destroy or transfer released objects
+        dispose_objects();
+
+        get_static_gc().static_collect(force);
+    }
+
+    void gc::static_collect(bool force)
+    {
+        // have we reached threshold before collection is necessary?
+        if (!force && !check_threshold())
+            return;
+
+        // 1) prepare release queue
+        init_collect();
+
+        // 2) all static objects are considered roots
+        node_map roots;
+        roots.insert(object_registry.begin(), object_registry.end());
+
+        // 3) mark phase
+        mark_objects(roots);
 
         // 5) destroy or transfer released objects
         dispose_objects();
@@ -180,7 +207,7 @@ namespace lutze
         sweep_objects();
 
         // 3) destroy or transfer released objects
-        dispose_objects();
+        dispose_objects(static_gc);
     }
 
     #if defined(GC_PLATFORM_WINDOWS)
@@ -282,7 +309,7 @@ namespace lutze
         }
     }
 
-    void gc::scan_stack(node_map& roots)
+    void gc::find_roots(node_map& roots)
     {
         void* stack;
         size_t stack_size;
@@ -353,7 +380,7 @@ namespace lutze
         }
     }
 
-    void gc::dispose_objects()
+    void gc::dispose_objects(bool destroy)
     {
         boost::mutex::scoped_lock lock(gc_registry_mutex);
 
@@ -367,14 +394,15 @@ namespace lutze
         // clean up phase
         for (node_map::iterator node = release_queue.begin(), last = release_queue.end(); node != last; ++node)
         {
+            // std::cout << "release:" << node->second.object << "\n";
+            unregister_object(node->second.object);
             gc_set remaining;
             std::set_difference(gc_running.begin(), gc_running.end(), node->second.history.begin(), node->second.history.end(), std::inserter(remaining, remaining.end()));
-            if (alloc_only || remaining.empty())
-            {
-                // destroy object after unregistering from this gc
-                unregister_object(node->second.object);
+
+            // destroy object when we're sure it doesn't belong to any other
+            // gc instance, otherwise transfer to first reamining gc
+            if (destroy || remaining.empty())
                 delete const_cast<gc_object*>(node->second.object);
-            }
             else
             {
                 // append object to first remaining gc transfer map
