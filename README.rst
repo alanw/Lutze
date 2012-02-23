@@ -1,7 +1,7 @@
 Lutze C++ Garbage Collector
 ===========================
 
-Welcome to the Lu-Tze C++ Garbage Collector version **2.1.0**.
+Welcome to the Lu-Tze C++ Garbage Collector version **2.2.0**.
 
 For Terry Pratchett fans, `Lu-Tze <http://en.wikipedia.org/wiki/History_Monks#Lu-Tze>`_
 is a familiar figure, however for the uninitiated, the character is known for
